@@ -8,7 +8,14 @@ from pathlib import Path
 
 TOKEN = os.environ.get("FINNHUB_API_KEY", "").strip()
 DATA_PATH = Path("data/edition.json")
+CONFIG_PATH = Path("config.json")
 DATA_PATH.parent.mkdir(exist_ok=True)
+
+config = json.loads(CONFIG_PATH.read_text())
+markets_cfg = config.get("markets", [])
+holdings_cfg = config.get("holdings", [])
+watch_cfg = markets_cfg + holdings_cfg
+news_symbols = [x["symbol"] for x in holdings_cfg if x.get("news")]
 
 if not TOKEN:
     if not DATA_PATH.exists():
@@ -16,17 +23,11 @@ if not TOKEN:
             "generatedAt": None,
             "market": [],
             "news": [],
-            "portfolioNews": []
+            "portfolioNews": [],
+            "config": config
         }, indent=2))
     print("FINNHUB_API_KEY is not configured yet; publishing the site with placeholder data.")
     raise SystemExit(0)
-
-WATCH = [
-    ("SPY", "S&P 500"), ("QQQ", "Nasdaq"), ("DIA", "Dow"),
-    ("VOO", "VOO"), ("TEM", "TEM"), ("ITW", "ITW"),
-    ("BP", "BP"), ("TTE", "TTE"), ("SONY", "SONY"), ("AIQ", "AIQ")
-]
-COMPANY_NEWS = ["TEM", "ITW", "BP", "TTE", "SONY", "AIQ"]
 
 
 def get_json(url):
@@ -51,14 +52,22 @@ def clean_article(a, label):
     }
 
 market = []
-for symbol, name in WATCH:
+for item in watch_cfg:
+    symbol = item["symbol"]
+    name = item.get("name", symbol)
     try:
         q = get_json(api("quote", symbol=symbol))
         market.append({
-            "symbol": symbol, "name": name,
-            "price": q.get("c"), "change": q.get("d"), "changePct": q.get("dp"),
-            "open": q.get("o"), "high": q.get("h"), "low": q.get("l"),
-            "previousClose": q.get("pc"), "timestamp": q.get("t")
+            "symbol": symbol,
+            "name": name,
+            "price": q.get("c"),
+            "change": q.get("d"),
+            "changePct": q.get("dp"),
+            "open": q.get("o"),
+            "high": q.get("h"),
+            "low": q.get("l"),
+            "previousClose": q.get("pc"),
+            "timestamp": q.get("t")
         })
     except Exception as e:
         market.append({"symbol": symbol, "name": name, "error": str(e)})
@@ -72,9 +81,13 @@ except Exception:
 portfolio_news = []
 today = dt.date.today()
 from_day = today - dt.timedelta(days=3)
-for symbol in COMPANY_NEWS:
+for symbol in news_symbols:
     try:
-        arr = get_json(api("company-news", symbol=symbol, **{"from": from_day.isoformat(), "to": today.isoformat()}))
+        arr = get_json(api(
+            "company-news",
+            symbol=symbol,
+            **{"from": from_day.isoformat(), "to": today.isoformat()}
+        ))
         portfolio_news.extend(clean_article(a, symbol) for a in arr[:4] if a.get("headline"))
     except Exception:
         pass
@@ -83,8 +96,9 @@ edition = {
     "generatedAt": dt.datetime.now(dt.timezone.utc).isoformat(),
     "market": market,
     "news": news,
-    "portfolioNews": portfolio_news
+    "portfolioNews": portfolio_news,
+    "config": config
 }
 
 DATA_PATH.write_text(json.dumps(edition, indent=2))
-print("Wrote data/edition.json")
+print("Wrote data/edition.json from config.json")
