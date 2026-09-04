@@ -1,0 +1,69 @@
+{
+  "markets": [
+    {"symbol": "SPY", "name": "S&P 500", "showInTicker": true},
+    {"symbol": "QQQ", "name": "Nasdaq", "showInTicker": true},
+    {"symbol": "DIA", "name": "Dow", "showInTicker": true}
+  ],
+  "holdings": [
+    {
+      "symbol": "VOO",
+      "name": "VOO",
+      "showInTicker": true,
+      "news": false,
+      "themes": ["core"],
+      "thesis": "Broad U.S. market exposure. A simple long-term anchor."
+    },
+    {
+      "symbol": "TEM",
+      "name": "TEM",
+      "showInTicker": true,
+      "news": true,
+      "themes": ["ai", "healthcare"],
+      "thesis": "Healthcare + AI growth. Watch revenue growth and the path to profit."
+    },
+    {
+      "symbol": "ITW",
+      "name": "ITW",
+      "showInTicker": false,
+      "news": true,
+      "themes": ["industrial", "dividend"],
+      "thesis": "High-quality industrial compounder. Watch margins, cash flow and dividend growth."
+    },
+    {
+      "symbol": "BP",
+      "name": "BP",
+      "showInTicker": true,
+      "news": true,
+      "themes": ["energy", "dividend"],
+      "thesis": "Energy income + oil exposure. Watch debt, operations and commodity prices."
+    },
+    {
+      "symbol": "TTE",
+      "name": "TTE",
+      "showInTicker": true,
+      "news": true,
+      "themes": ["energy", "dividend"],
+      "thesis": "Integrated energy + dividends. Watch oil/LNG and shareholder returns."
+    },
+    {
+      "symbol": "SONY",
+      "name": "SONY",
+      "showInTicker": false,
+      "news": true,
+      "themes": ["consumer", "technology"],
+      "thesis": "Gaming, entertainment and technology. Watch PlayStation, media and buybacks."
+    },
+    {
+      "symbol": "AIQ",
+      "name": "AIQ",
+      "showInTicker": false,
+      "news": true,
+      "themes": ["ai"],
+      "thesis": "Diversified AI exposure. Watch AI spending and interest rates."
+    }
+  ],
+  "sections": {
+    "energyThemes": ["energy"],
+    "aiHealthThemes": ["ai", "healthcare"]
+  }
+}
