@@ -1,14 +1,4 @@
-const HOLDINGS = {
-  VOO: "Broad U.S. market exposure. A simple long-term anchor.",
-  TEM: "Healthcare + AI growth. Watch revenue growth and the path to profit.",
-  ITW: "High-quality industrial compounder. Watch margins, cash flow and dividend growth.",
-  BP: "Energy income + oil exposure. Watch debt, operations and commodity prices.",
-  TTE: "Integrated energy + dividends. Watch oil/LNG and shareholder returns.",
-  SONY: "Gaming, entertainment and technology. Watch PlayStation, media and buybacks.",
-  AIQ: "Diversified AI exposure. Watch AI spending and interest rates."
-};
-
-let edition = { market: [], news: [], portfolioNews: [], generatedAt: null };
+let edition = { market: [], news: [], portfolioNews: [], generatedAt: null, config: {markets:[],holdings:[],sections:{}} };
 
 function fmtPct(v){
   if(v == null || !Number.isFinite(Number(v))) return "—";
@@ -24,11 +14,15 @@ function fmtPrice(v){
 }
 function setStatus(kind,title,text){
   const box = document.getElementById("dataStatus");
+  if(!box) return;
   box.className = `data-status ${kind}`;
   box.querySelector("b").textContent = title;
   document.getElementById("dataStatusText").textContent = text;
 }
 function get(name){ return (edition.market || []).find(x => x.name === name); }
+function bySymbol(symbol){ return (edition.market || []).find(x => x.symbol === symbol); }
+function cfgHoldings(){ return edition.config?.holdings || []; }
+function cfgMarkets(){ return edition.config?.markets || []; }
 
 async function load(){
   setStatus("loading","Loading latest edition…","Checking the newest data published by GitHub Actions.");
@@ -36,6 +30,10 @@ async function load(){
     const r = await fetch(`./data/edition.json?ts=${Date.now()}`, {cache:"no-store"});
     if(!r.ok) throw new Error(`edition.json returned ${r.status}`);
     edition = await r.json();
+    if(!edition.config){
+      const cr = await fetch(`./config.json?ts=${Date.now()}`, {cache:"no-store"});
+      if(cr.ok) edition.config = await cr.json();
+    }
     render();
     const dt = edition.generatedAt ? new Date(edition.generatedAt) : null;
     setStatus("good","Latest edition loaded.",dt ? `Published ${dt.toLocaleString()}` : "Published by GitHub Actions.");
@@ -51,14 +49,15 @@ async function load(){
 function render(){
   document.getElementById("date").textContent = new Date().toLocaleDateString(undefined,{weekday:"long",year:"numeric",month:"long",day:"numeric"});
 
-  const top = ["S&P 500","Nasdaq","Dow","VOO","TEM","BP","TTE"];
-  document.getElementById("ticker").innerHTML = top.map(n => {
-    const x = get(n) || {};
+  const tickerItems = [...cfgMarkets(), ...cfgHoldings()].filter(x => x.showInTicker);
+  document.getElementById("ticker").innerHTML = tickerItems.map(item => {
+    const x = bySymbol(item.symbol) || {};
     const cls = Number(x.changePct || 0) >= 0 ? "pos" : "neg";
-    return `<div class="tick"><span>${n}</span><b class="${cls}">${fmtPrice(x.price)} ${fmtPct(x.changePct)}</b></div>`;
-  }).join("");
+    return `<div class="tick"><span>${item.name || item.symbol}</span><b class="${cls}">${fmtPrice(x.price)} ${fmtPct(x.changePct)}</b></div>`;
+  }).join("") || "<span>No ticker items configured.</span>";
 
-  const values = ["S&P 500","Nasdaq","Dow"].map(n => Number(get(n)?.changePct)).filter(Number.isFinite);
+  const marketNames = cfgMarkets().map(x => x.name);
+  const values = marketNames.map(n => Number(get(n)?.changePct)).filter(Number.isFinite);
   const avg = values.length ? values.reduce((a,b)=>a+b,0)/values.length : 0;
   document.getElementById("mood").textContent =
     !values.length ? "⚪ Waiting for data" :
@@ -71,8 +70,9 @@ function render(){
     ? "Waiting for market data."
     : avg >= 0 ? "Stocks are leaning higher." : "Stocks are under pressure.";
 
-  document.getElementById("pulseText").textContent = values.length
-    ? `S&P proxy ${fmtPct(get("S&P 500")?.changePct)}, Nasdaq proxy ${fmtPct(get("Nasdaq")?.changePct)}, Dow proxy ${fmtPct(get("Dow")?.changePct)}.`
+  const pulseParts = cfgMarkets().slice(0,3).map(m => `${m.name} ${fmtPct(get(m.name)?.changePct)}`);
+  document.getElementById("pulseText").textContent = pulseParts.length
+    ? `${pulseParts.join(", ")}.`
     : "The next GitHub Action run will publish fresh market data here.";
 
   renderHeadlines();
@@ -99,19 +99,28 @@ function renderHeadlines(){
       <small>${h.source || "News"}</small>
     </div>`).join("") || "<p>No published headlines yet.</p>";
 
-  const energy = pnews.filter(h => ["BP","TTE"].includes(h.label));
-  const aiHealth = pnews.filter(h => ["TEM","AIQ"].includes(h.label));
+  const holdingMap = Object.fromEntries(cfgHoldings().map(h => [h.symbol, h]));
+  const energyThemes = edition.config?.sections?.energyThemes || ["energy"];
+  const aiHealthThemes = edition.config?.sections?.aiHealthThemes || ["ai","healthcare"];
+  const hasTheme = (symbol, themes) => {
+    const item = holdingMap[symbol];
+    return !!item && (item.themes || []).some(t => themes.includes(t));
+  };
+
+  const energy = pnews.filter(h => hasTheme(h.label, energyThemes));
+  const aiHealth = pnews.filter(h => hasTheme(h.label, aiHealthThemes));
 
   document.getElementById("energyNews").innerHTML = energy.slice(0,6).map(h => `
     <div class="headline"><a href="${h.url}" target="_blank" rel="noopener">${h.headline}</a><small>${h.label} • ${h.source || ""}</small></div>`
-  ).join("") || "<p>No new BP/TTE headlines in the latest edition.</p>";
+  ).join("") || "<p>No new energy-related holding headlines in the latest edition.</p>";
 
   document.getElementById("aiHealthNews").innerHTML = aiHealth.slice(0,6).map(h => `
     <div class="headline"><a href="${h.url}" target="_blank" rel="noopener">${h.headline}</a><small>${h.label} • ${h.source || ""}</small></div>`
-  ).join("") || "<p>No new TEM/AIQ headlines in the latest edition.</p>";
+  ).join("") || "<p>No new AI/healthcare holding headlines in the latest edition.</p>";
 
+  const holdingSymbols = cfgHoldings().map(h => h.symbol);
   const movers = (edition.market || [])
-    .filter(x => ["VOO","TEM","ITW","BP","TTE","SONY","AIQ"].includes(x.name) && Number.isFinite(Number(x.changePct)))
+    .filter(x => holdingSymbols.includes(x.symbol) && Number.isFinite(Number(x.changePct)))
     .sort((a,b) => Math.abs(Number(b.changePct)) - Math.abs(Number(a.changePct)));
 
   if(movers[0]){
@@ -124,17 +133,17 @@ function renderHeadlines(){
 }
 
 function renderPortfolio(){
-  document.getElementById("portfolioCards").innerHTML = ["VOO","TEM","ITW","BP","TTE","SONY","AIQ"].map(n => {
-    const x = get(n) || {};
+  document.getElementById("portfolioCards").innerHTML = cfgHoldings().map(item => {
+    const x = bySymbol(item.symbol) || {};
     const cls = Number(x.changePct || 0) >= 0 ? "pos" : "neg";
     return `<article class="card">
-      <label>${n}</label><h3>${n}</h3>
+      <label>${item.symbol}</label><h3>${item.name || item.symbol}</h3>
       <div class="price">${fmtPrice(x.price)}</div>
       <b class="${cls}">${fmtPct(x.changePct)}</b>
-      <p>${HOLDINGS[n]}</p>
+      <p>${item.thesis || "No thesis note configured yet."}</p>
       <small>${x.price ? "Latest published quote" : "Waiting for quote"}</small>
     </article>`;
-  }).join("");
+  }).join("") || "<p>No holdings configured.</p>";
 }
 
 document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
