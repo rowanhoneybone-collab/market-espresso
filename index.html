@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Market Espresso</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Libre+Caslon+Display&family=Libre+Caslon+Text:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./styles.css"/>
+</head>
+<body>
+<div class="paper">
+<header>
+  <div class="topline">
+    <span id="date"></span><span>Morning Edition</span>
+    <button id="refresh">☕ Refresh Latest Edition</button>
+  </div>
+  <div class="brand">
+    <div><small>Markets, minus the noise.</small><h1>MARKET ESPRESSO</h1></div>
+    <div class="mood"><span>TODAY'S BREW</span><b id="mood">Loading…</b><small id="stamp">Reading latest published edition</small></div>
+  </div>
+  <nav>
+    <button class="active" data-tab="front">Front Page</button>
+    <button data-tab="money">My Money</button>
+    <button data-tab="rates">Fed & Bonds</button>
+    <button data-tab="energy">Energy</button>
+    <button data-tab="ai">AI + Health</button>
+  </nav>
+  <div class="ticker" id="ticker"><span>Loading live market prices…</span></div>
+</header>
+
+<main>
+<section id="front" class="tab active">
+  <div class="hero">
+    <article>
+      <label>THE BIG STORY</label>
+      <h2 id="leadTitle">Brewing today's edition…</h2>
+      <p class="dek" id="leadText">Loading current headlines and market prices.</p>
+      <div class="why"><b>Why you care</b><p id="leadWhy">We'll translate the market into what it means for your holdings.</p></div>
+    </article>
+    <aside>
+      <label>TOP HEADLINES</label>
+      <div id="headlineList"></div>
+    </aside>
+  </div>
+  <div class="rule"></div>
+  <div class="three">
+    <article><label>MARKET PULSE</label><h3 id="pulseTitle">Loading…</h3><p id="pulseText"></p></article>
+    <article><label>PORTFOLIO SIGNAL</label><h3 id="portfolioTitle">Loading…</h3><p id="portfolioText"></p></article>
+    <article><label>LEARN ONE THING</label><h3>Why do bond yields matter?</h3><p>If government bonds pay more, investors have a safer alternative to stocks. That can make expensive growth stocks less attractive.</p></article>
+  </div>
+</section>
+
+<section id="money" class="tab">
+  <div class="sectionHead"><div><label>MY MONEY</label><h2>Your holdings.</h2></div><p>Price moves come from the latest published market data. The thesis notes stay focused on the long term.</p></div>
+  <div class="cards" id="portfolioCards"></div>
+</section>
+
+<section id="rates" class="tab">
+  <div class="sectionHead"><div><label>FED & BONDS</label><h2>Interest rates, translated.</h2></div></div>
+  <div class="explainer">
+    <h3>Think of rates as the price of money.</h3>
+    <p>When rates are high, mortgages, car loans and business borrowing cost more. That can slow the economy. High bond yields also give investors a safer place to earn returns, so stocks—especially high-growth stocks—have to work harder to look attractive.</p>
+    <div class="flow"><span>Rates ↑</span><b>→</b><span>Borrowing costs ↑</span><b>→</b><span>Growth can slow</span><b>→</b><span>Expensive stocks feel pressure</span></div>
+  </div>
+</section>
+
+<section id="energy" class="tab">
+  <div class="sectionHead"><div><label>ENERGY CHAIN</label><h2>Where energy companies make money.</h2></div></div>
+  <div class="chain">
+    <article><b>01</b><h3>Upstream</h3><p>Finds and produces oil and gas.</p><strong>Higher commodity prices usually help.</strong></article>
+    <article><b>02</b><h3>Midstream</h3><p>Pipelines, storage and transport.</p><strong>Volume and contracts often matter more than price.</strong></article>
+    <article><b>03</b><h3>Downstream</h3><p>Refining and selling fuels.</p><strong>Profit margins matter more than crude price alone.</strong></article>
+  </div>
+  <div class="newsBlock"><label>LIVE ENERGY HEADLINES</label><div id="energyNews"></div></div>
+</section>
+
+<section id="ai" class="tab">
+  <div class="sectionHead"><div><label>AI + HEALTHCARE</label><h2>Proof over hype.</h2></div></div>
+  <div class="two">
+    <article><h3>Tempus AI</h3><p><b>Simple thesis:</b> Tempus becomes more valuable if it can turn medical data and AI into products that doctors and drug companies repeatedly pay for.</p></article>
+    <article><h3>AIQ</h3><p><b>Simple thesis:</b> AIQ spreads your AI exposure across many companies, lowering single-stock risk while still leaving you exposed to growth-stock valuations and interest rates.</p></article>
+  </div>
+  <div class="newsBlock"><label>LIVE AI + HEALTHCARE HEADLINES</label><div id="aiHealthNews"></div></div>
+</section>
+</main>
+<footer>Market Espresso • Learning and research only, not investment advice.</footer>
+</div>
+<script src="./app.js"></script>
+</body>
+</html>
