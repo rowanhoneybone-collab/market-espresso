@@ -7,8 +7,19 @@ import urllib.request
 from pathlib import Path
 
 TOKEN = os.environ.get("FINNHUB_API_KEY", "").strip()
+DATA_PATH = Path("data/edition.json")
+DATA_PATH.parent.mkdir(exist_ok=True)
+
 if not TOKEN:
-    raise SystemExit("FINNHUB_API_KEY is missing")
+    if not DATA_PATH.exists():
+        DATA_PATH.write_text(json.dumps({
+            "generatedAt": None,
+            "market": [],
+            "news": [],
+            "portfolioNews": []
+        }, indent=2))
+    print("FINNHUB_API_KEY is not configured yet; publishing the site with placeholder data.")
+    raise SystemExit(0)
 
 WATCH = [
     ("SPY", "S&P 500"), ("QQQ", "Nasdaq"), ("DIA", "Dow"),
@@ -38,7 +49,6 @@ def clean_article(a, label):
         "url": a.get("url") or "",
         "datetime": a.get("datetime")
     }
-
 
 market = []
 for symbol, name in WATCH:
@@ -76,6 +86,5 @@ edition = {
     "portfolioNews": portfolio_news
 }
 
-Path("data").mkdir(exist_ok=True)
-Path("data/edition.json").write_text(json.dumps(edition, indent=2))
+DATA_PATH.write_text(json.dumps(edition, indent=2))
 print("Wrote data/edition.json")
