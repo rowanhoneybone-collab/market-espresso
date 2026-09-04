@@ -1,6 +1,8 @@
 name: Brew Market Espresso
 
 on:
+  push:
+    branches: ["main"]
   workflow_dispatch:
   schedule:
     - cron: "*/30 13-22 * * 1-5"
