@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Libre+Caslon+Display&family=Libre+Caslon+Text:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./styles.css"/>
 <link rel="stylesheet" href="./dividends.css"/>
+<link rel="stylesheet" href="./opportunities.css"/>
 </head>
 <body>
 <div class="paper">
@@ -25,6 +26,7 @@
     <button class="active" data-tab="front">Front Page</button>
     <button data-tab="money">My Money</button>
     <button data-tab="dividends">Dividends</button>
+    <button data-tab="opportunities">Opportunities</button>
     <button data-tab="rates">Fed & Bonds</button>
     <button data-tab="energy">Energy</button>
     <button data-tab="ai">AI + Health</button>
@@ -75,6 +77,37 @@
   </div>
 </section>
 
+<section id="opportunities" class="tab">
+  <div class="sectionHead"><div><label>DIVIDEND OPPORTUNITIES</label><h2>Doc's winning-stock formula.</h2></div><p>A quality-first screen based on the five requirements in Bob Taylor's forwarded investing article.</p></div>
+
+  <div class="formulaIntro">
+    <div>
+      <label>THE IDEA</label>
+      <p class="formulaLead">Start with companies that have already raised their dividends for at least a decade, then demand consistent sales growth, strong asset efficiency, manageable leverage and a reasonable valuation.</p>
+      <div class="why"><b>How to read this</b><p><b>5 / 5</b> means the stock clears every rule. A near miss can still be a good business, but Market Espresso will show which requirement it fails instead of quietly lowering the bar.</p></div>
+    </div>
+    <aside class="formulaAside">
+      <label>IMPORTANT</label>
+      <h3>A screen is a starting point.</h3>
+      <p>Passing all five filters does not automatically make a stock a buy. It means the company deserves a closer look at its business, risks, valuation and dividend sustainability.</p>
+    </aside>
+  </div>
+
+  <div class="formulaGrid" id="formulaCriteria"></div>
+  <div class="opMeta" id="opportunityMeta"></div>
+
+  <div class="newsBlock opBlock">
+    <div class="miniHead"><div><label>FULL FORMULA PASSES</label><h3>Stocks clearing all five rules.</h3></div><p>Sorted by a quality/value tie-breaker after every requirement has been satisfied.</p></div>
+    <div id="opportunityWinners"></div>
+  </div>
+
+  <div class="newsBlock opBlock">
+    <div class="miniHead"><div><label>NEAR MISSES</label><h3>Four out of five.</h3></div><p>Useful research candidates that currently miss exactly one requirement.</p></div>
+    <div id="opportunityNearMisses"></div>
+  </div>
+  <p class="sourceNote" id="opportunitySource"></p>
+</section>
+
 <section id="rates" class="tab">
   <div class="sectionHead"><div><label>FED & BONDS</label><h2>Interest rates, translated.</h2></div></div>
   <div class="explainer">
@@ -106,5 +139,6 @@
 <footer>Market Espresso • Learning and research only, not investment advice.</footer>
 </div>
 <script src="./app.js"></script>
+<script src="./opportunities.js"></script>
 </body>
 </html>
