@@ -96,8 +96,24 @@
   <div class="formulaGrid" id="formulaCriteria"></div>
   <div class="opMeta" id="opportunityMeta"></div>
 
+  <div class="opTools">
+    <div class="stockFinder">
+      <label for="opportunitySearch">STOCK SEARCH</label>
+      <h3>Find any screened dividend grower.</h3>
+      <div class="searchBox"><span>⌕</span><input id="opportunitySearch" type="search" autocomplete="off" placeholder="Search ticker or company — e.g. KO, Pepsi, Chevron"/></div>
+      <p>Search covers the full screened universe, including stocks that do not currently make the 5/5 or 4/5 lists.</p>
+      <div id="stockSearchResults" class="stockSearchResults"></div>
+    </div>
+    <div class="sectorFinder">
+      <label>SECTOR BREAKDOWN</label>
+      <h3>5/5 matches by business area.</h3>
+      <p>Click a sector to focus the matched-stock tables. “Produced Goods / Industrials” includes manufacturers, transportation and other industrial businesses.</p>
+      <div id="opportunitySectors" class="sectorChips"></div>
+    </div>
+  </div>
+
   <div class="newsBlock opBlock">
-    <div class="miniHead"><div><label>FULL FORMULA PASSES</label><h3>Stocks clearing all five rules.</h3></div><p>Sorted by a quality/value tie-breaker after every requirement has been satisfied.</p></div>
+    <div class="miniHead"><div><label>FULL FORMULA PASSES</label><h3>Stocks clearing all five rules.</h3></div><p>Grouped by sector, then sorted by a quality/value tie-breaker after every requirement has been satisfied.</p></div>
     <div id="opportunityWinners"></div>
   </div>
 
