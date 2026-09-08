@@ -69,6 +69,19 @@ jobs:
           PY
           fi
 
+      - name: Validate opportunity screen
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data = json.loads(Path("data/opportunities.json").read_text())
+          if data.get("status") != "ok":
+              raise SystemExit(f"Opportunity screen did not complete: {data.get('error', 'unknown error')}")
+          if int(data.get("screenedCount", 0)) < 1:
+              raise SystemExit("Opportunity screen returned no complete stock records.")
+          print(f"Validated {data.get('screenedCount')} complete records and {data.get('winnerCount', 0)} 5/5 passes.")
+          PY
+
       - name: Save opportunity snapshot
         run: |
           git config user.name "github-actions[bot]"
