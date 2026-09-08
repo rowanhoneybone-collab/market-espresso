@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 import datetime as dt
+import io
 import json
-import os
+import math
 import re
-import time
 from pathlib import Path
 
 import requests
 from bs4 import BeautifulSoup
+from pypdf import PdfReader
 
 CONFIG_PATH = Path("config.json")
 OUTPUT_PATH = Path("data/opportunities.json")
@@ -20,24 +21,29 @@ MIN_ROA = float(criteria.get("minRoaPct", 10))
 MIN_DIVIDEND_YEARS = int(criteria.get("minDividendGrowthYears", 10))
 MAX_NET_DEBT_EBITDA = float(criteria.get("maxNetDebtToEbitda", 4))
 MAX_PE = float(criteria.get("maxPe", 25))
-FINNHUB_API_KEY = os.environ.get("FINNHUB_API_KEY", "").strip()
-REQUEST_DELAY = float(os.environ.get("OPPORTUNITY_REQUEST_DELAY", "1.05"))
 
-VIG_HOLDINGS_URL = "https://companiesmarketcap.com/vanguard-dividend-appreciation-index-fund-etf-shares/holdings/"
-FINNHUB_METRIC_URL = "https://finnhub.io/api/v1/stock/metric"
-SEC_TICKERS_URL = "https://www.sec.gov/files/company_tickers.json"
-SEC_COMPANYFACTS_URL = "https://data.sec.gov/api/xbrl/companyfacts/CIK{cik}.json"
+NASDAQ_ACHIEVERS_PDF = "https://www.nasdaq.com/docs/index/DAATR"
+FALLBACK_ACHIEVERS_URL = "https://dividendhistory.org/tags/dividend-achiever/"
+TRADINGVIEW_SCAN_URL = "https://scanner.tradingview.com/america/scan"
 
 HTTP = requests.Session()
 HTTP.headers.update({
-    "User-Agent": "MarketEspresso/1.0 dividend research dashboard (contact: rowanhoneybone@gmail.com)",
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/152 Safari/537.36 MarketEspresso/1.0",
     "Accept-Language": "en-US,en;q=0.9",
 })
-REVENUE_TAGS = [
-    "RevenueFromContractWithCustomerExcludingAssessedTax",
-    "Revenues",
-    "SalesRevenueNet",
-    "SalesRevenueGoodsNet",
+
+TV_COLUMNS = [
+    "market_cap_basic",
+    "price_earnings_current",
+    "return_on_assets",
+    "net_debt",
+    "ebitda_ttm",
+    "total_revenue_fy",
+    "total_revenue_fy_h",
+    "dividends_yield_current",
+    "dividend_ex_date_upcoming",
+    "dividend_amount_upcoming",
+    "dividend_payment_date_upcoming",
 ]
 
 
@@ -46,155 +52,130 @@ def safe_num(value):
         if value is None or isinstance(value, bool):
             return None
         value = float(value)
-        return value if value == value and abs(value) != float("inf") else None
+        return value if math.isfinite(value) else None
     except (TypeError, ValueError):
         return None
 
 
-def first_metric(metrics, *keys):
-    for key in keys:
-        value = safe_num(metrics.get(key))
-        if value is not None:
-            return value
-    return None
+def normalize_symbol(symbol):
+    return str(symbol or "").upper().strip().replace("/", ".").replace(" ", "")
 
 
-def get_json(url, *, params=None, timeout=30):
-    response = HTTP.get(url, params=params, timeout=timeout)
-    response.raise_for_status()
-    return response.json()
-
-
-def get_text(url, *, timeout=30):
+def get_bytes(url, timeout=35):
     response = HTTP.get(url, timeout=timeout)
     response.raise_for_status()
-    return response.text
+    return response.content
 
 
-def normalize_symbol(symbol):
-    return str(symbol or "").upper().strip().replace("/", ".")
+def get_text(url, timeout=35):
+    return get_bytes(url, timeout=timeout).decode("utf-8", errors="replace")
+
+
+def parse_nasdaq_achievers_pdf(raw):
+    reader = PdfReader(io.BytesIO(raw))
+    rows = []
+    # Nasdaq rows extract as: COMPANY NAME TICKER WEIGHT.
+    pattern = re.compile(r"^(.*?)\s+([A-Z][A-Z0-9.\-]{0,11})\s+([0-9]+(?:\.[0-9]+)?)$")
+    for page in reader.pages:
+        text = page.extract_text() or ""
+        for raw_line in text.splitlines():
+            line = " ".join(raw_line.split())
+            match = pattern.match(line)
+            if not match:
+                continue
+            name, symbol, weight = match.groups()
+            symbol = normalize_symbol(symbol)
+            if name.lower().startswith("name symbol") or symbol in {"DAA", "DAATR"}:
+                continue
+            if re.fullmatch(r"[A-Z][A-Z0-9.\-]{0,11}", symbol):
+                rows.append({"symbol": symbol, "name": name.strip() or symbol, "indexWeightPct": safe_num(weight)})
+    deduped = {}
+    for row in rows:
+        deduped[row["symbol"]] = row
+    return list(deduped.values())
+
+
+def parse_fallback_achievers(html):
+    soup = BeautifulSoup(html, "html.parser")
+    rows = []
+    for tr in soup.find_all("tr"):
+        cells = [" ".join(c.stripped_strings).strip() for c in tr.find_all(["td", "th"])]
+        if len(cells) < 5:
+            continue
+        market = cells[-2].upper()
+        symbol = normalize_symbol(cells[-1])
+        if market == "US" and re.fullmatch(r"[A-Z][A-Z0-9.\-]{0,11}", symbol):
+            rows.append({"symbol": symbol, "name": cells[1] if len(cells) > 1 else symbol, "indexWeightPct": None})
+    deduped = {row["symbol"]: row for row in rows}
+    return list(deduped.values())
 
 
 def fetch_dividend_growth_universe():
-    """Current VIG holdings: a broad U.S. universe that already clears 10 years of dividend growth."""
-    soup = BeautifulSoup(get_text(VIG_HOLDINGS_URL), "html.parser")
-    universe = []
-    for table in soup.find_all("table"):
-        headers = [" ".join(x.stripped_strings).strip().lower() for x in table.find_all("th")]
-        if not any("ticker" in h for h in headers):
-            continue
-        for tr in table.find_all("tr"):
-            cells = [" ".join(c.stripped_strings).strip() for c in tr.find_all("td")]
-            if len(cells) < 3:
-                continue
-            ticker = normalize_symbol(cells[2])
-            name = cells[1].strip()
-            if re.fullmatch(r"[A-Z][A-Z0-9.\-]{0,11}", ticker) and ticker not in {"USD", "VIG"}:
-                universe.append({"symbol": ticker, "name": name or ticker})
+    errors = []
+    try:
+        universe = parse_nasdaq_achievers_pdf(get_bytes(NASDAQ_ACHIEVERS_PDF))
+        if len(universe) >= 300:
+            return universe, "Nasdaq US Broad Dividend Achievers Index"
+        errors.append(f"Nasdaq PDF returned only {len(universe)} usable constituents")
+    except Exception as exc:
+        errors.append(f"Nasdaq PDF: {exc}")
+
+    try:
+        universe = parse_fallback_achievers(get_text(FALLBACK_ACHIEVERS_URL))
         if len(universe) >= 100:
-            break
-    deduped = {item["symbol"]: item for item in universe}
-    out = list(deduped.values())
-    if len(out) < 100:
-        raise RuntimeError(f"Dividend-growth holdings source returned only {len(out)} usable stocks.")
+            return universe, "Dividend Achievers fallback list"
+        errors.append(f"fallback list returned only {len(universe)} usable constituents")
+    except Exception as exc:
+        errors.append(f"fallback list: {exc}")
+
+    raise RuntimeError("Dividend-growth universe unavailable: " + "; ".join(errors))
+
+
+def extract_history(raw):
+    if raw is None:
+        return []
+    if isinstance(raw, dict):
+        for key in ("values", "data", "series"):
+            if key in raw:
+                return extract_history(raw[key])
+        out = []
+        for value in raw.values():
+            num = safe_num(value)
+            if num is not None:
+                out.append(num)
+        return out
+    if not isinstance(raw, (list, tuple)):
+        num = safe_num(raw)
+        return [num] if num is not None else []
+    out = []
+    for item in raw:
+        num = safe_num(item)
+        if num is not None:
+            out.append(num)
+            continue
+        if isinstance(item, (list, tuple)):
+            nums = [safe_num(x) for x in item]
+            nums = [x for x in nums if x is not None]
+            if nums:
+                out.append(nums[-1])
+        elif isinstance(item, dict):
+            for key in ("value", "v", "close"):
+                num = safe_num(item.get(key))
+                if num is not None:
+                    out.append(num)
+                    break
     return out
 
 
-def fetch_finnhub_metric(symbol):
-    payload = get_json(
-        FINNHUB_METRIC_URL,
-        params={"symbol": symbol.replace(".", "-"), "metric": "all", "token": FINNHUB_API_KEY},
-        timeout=25,
-    )
-    metrics = payload.get("metric") or {}
-    if not metrics:
-        return {"metricError": "Finnhub returned no basic financial metrics."}
-
-    pe = first_metric(metrics, "peBasicExclExtraTTM", "peTTM", "peExclExtraTTM", "peAnnual")
-    roa = first_metric(metrics, "roaTTM", "roaRfy", "roa5Y")
-    market_cap = first_metric(metrics, "marketCapitalization")
-    enterprise_value = first_metric(metrics, "enterpriseValue")
-    net_debt = first_metric(metrics, "netDebtInterim", "netDebtAnnual")
-    ebitda_per_share = first_metric(metrics, "ebitdPerShareTTM", "ebitdPerShareAnnual")
-    eps = first_metric(metrics, "epsBasicExclExtraItemsTTM", "epsExclExtraItemsTTM", "epsTTM")
-    dividend_yield = first_metric(metrics, "dividendYieldIndicatedAnnual", "currentDividendYieldTTM")
-
-    implied_price = pe * eps if pe and eps and pe > 0 and eps > 0 else None
-    shares_millions = market_cap / implied_price if market_cap is not None and implied_price else None
-    ebitda_millions = ebitda_per_share * shares_millions if ebitda_per_share is not None and shares_millions else None
-    if net_debt is None and enterprise_value is not None and market_cap is not None:
-        net_debt = enterprise_value - market_cap
-    leverage = net_debt / ebitda_millions if net_debt is not None and ebitda_millions and ebitda_millions > 0 else None
-
-    return {
-        "pe": pe,
-        "roaPct": roa,
-        "marketCap": market_cap,
-        "enterpriseValue": enterprise_value,
-        "netDebt": net_debt,
-        "ebitdaMillions": ebitda_millions,
-        "netDebtToEbitda": leverage,
-        "dividendYieldPct": dividend_yield,
-        "revenueGrowth3Y": first_metric(metrics, "revenueGrowth3Y"),
-        "metricError": None,
-    }
-
-
-def load_sec_ticker_map():
-    raw = get_json(SEC_TICKERS_URL)
-    mapping = {}
-    for item in raw.values():
-        ticker = normalize_symbol(item.get("ticker"))
-        cik = item.get("cik_str")
-        if ticker and cik is not None:
-            padded = str(cik).zfill(10)
-            mapping[ticker] = padded
-            mapping[ticker.replace("-", ".")] = padded
-            mapping[ticker.replace(".", "-")] = padded
-    return mapping
-
-
-def annual_values_for_tag(companyfacts, tag):
-    fact = (((companyfacts.get("facts") or {}).get("us-gaap") or {}).get(tag) or {})
-    rows = (fact.get("units") or {}).get("USD") or []
-    candidates = []
-    for row in rows:
-        if row.get("form") not in {"10-K", "10-K/A"} or not row.get("start") or not row.get("end"):
-            continue
-        try:
-            start = dt.date.fromisoformat(row["start"][:10])
-            end = dt.date.fromisoformat(row["end"][:10])
-        except Exception:
-            continue
-        if not 250 <= (end - start).days <= 440:
-            continue
-        value = safe_num(row.get("val"))
-        if value is not None:
-            candidates.append({"end": row["end"][:10], "filed": str(row.get("filed") or ""), "value": value})
-    by_end = {}
-    for row in candidates:
-        old = by_end.get(row["end"])
-        if old is None or row["filed"] > old["filed"]:
-            by_end[row["end"]] = row
-    return [x["value"] for x in sorted(by_end.values(), key=lambda x: x["end"], reverse=True)]
-
-
-def revenue_history_from_sec(symbol, cik_map):
-    cik = cik_map.get(symbol) or cik_map.get(symbol.replace(".", "-"))
-    if not cik:
-        return [], "No SEC CIK mapping found."
-    try:
-        facts = get_json(SEC_COMPANYFACTS_URL.format(cik=cik), timeout=35)
-    except Exception as exc:
-        return [], f"SEC companyfacts request failed: {exc}"
-    best = []
-    for tag in REVENUE_TAGS:
-        values = annual_values_for_tag(facts, tag)
-        if len(values) > len(best):
-            best = values
-    if len(best) < MIN_REVENUE_YEARS + 1:
-        return best, f"Only {len(best)} annual revenue observations found in SEC filings."
-    return best[:8], None
+def orient_history(values, latest):
+    values = [v for v in values if v is not None and v >= 0]
+    if len(values) < 2 or latest is None or latest == 0:
+        return values
+    first_diff = abs(values[0] - latest) / abs(latest)
+    last_diff = abs(values[-1] - latest) / abs(latest)
+    if last_diff < first_diff:
+        values.reverse()
+    return values
 
 
 def revenue_streak(values):
@@ -207,20 +188,90 @@ def revenue_streak(values):
     return streak
 
 
-def non_revenue_flags(record):
-    pe, roa, leverage = record.get("pe"), record.get("roaPct"), record.get("netDebtToEbitda")
+def fetch_tradingview_market():
+    payload = {
+        "filter": [],
+        "options": {"lang": "en"},
+        "markets": ["america"],
+        "symbols": {"query": {"types": []}, "tickers": []},
+        "columns": TV_COLUMNS,
+        "sort": {"sortBy": "market_cap_basic", "sortOrder": "desc"},
+        "range": [0, 10000],
+    }
+    response = HTTP.post(TRADINGVIEW_SCAN_URL, json=payload, timeout=60)
+    response.raise_for_status()
+    data = response.json().get("data") or []
+    if len(data) < 1000:
+        raise RuntimeError(f"TradingView returned only {len(data)} U.S. market rows")
+
+    market = {}
+    for item in data:
+        full_symbol = str(item.get("s") or "")
+        ticker = normalize_symbol(full_symbol.split(":")[-1])
+        values = item.get("d") or []
+        if not ticker or len(values) < len(TV_COLUMNS):
+            continue
+        row = dict(zip(TV_COLUMNS, values))
+        row["exchangeSymbol"] = full_symbol
+        old = market.get(ticker)
+        old_cap = safe_num(old.get("market_cap_basic")) if old else None
+        new_cap = safe_num(row.get("market_cap_basic"))
+        if old is None or (new_cap or -1) > (old_cap or -1):
+            market[ticker] = row
+    return market
+
+
+def timestamp_to_date(value):
+    num = safe_num(value)
+    if num is None:
+        return None
+    try:
+        return dt.datetime.fromtimestamp(num, tz=dt.timezone.utc).date().isoformat()
+    except Exception:
+        return None
+
+
+def make_record(base, tv):
+    pe = safe_num(tv.get("price_earnings_current"))
+    roa = safe_num(tv.get("return_on_assets"))
+    net_debt = safe_num(tv.get("net_debt"))
+    ebitda = safe_num(tv.get("ebitda_ttm"))
+    leverage = net_debt / ebitda if net_debt is not None and ebitda is not None and ebitda > 0 else None
+    latest_revenue = safe_num(tv.get("total_revenue_fy"))
+    history = orient_history(extract_history(tv.get("total_revenue_fy_h")), latest_revenue)
+    if latest_revenue is not None:
+        if not history:
+            history = [latest_revenue]
+        elif abs(history[0] - latest_revenue) / max(abs(latest_revenue), 1) > 0.01:
+            history.insert(0, latest_revenue)
     return {
-        "roa": roa is not None and roa >= MIN_ROA,
-        "dividend": True,
-        "debt": leverage is not None and leverage < MAX_NET_DEBT_EBITDA,
-        "pe": pe is not None and pe > 0 and pe < MAX_PE,
+        **base,
+        "exchangeSymbol": tv.get("exchangeSymbol"),
+        "pe": pe,
+        "roaPct": roa,
+        "marketCap": safe_num(tv.get("market_cap_basic")),
+        "netDebt": net_debt,
+        "ebitda": ebitda,
+        "netDebtToEbitda": leverage,
+        "dividendGrowthYears": MIN_DIVIDEND_YEARS,
+        "dividendGrowthYearsIsFloor": True,
+        "dividendYieldPct": safe_num(tv.get("dividends_yield_current")),
+        "nextExDate": timestamp_to_date(tv.get("dividend_ex_date_upcoming")),
+        "nextDividendAmount": safe_num(tv.get("dividend_amount_upcoming")),
+        "nextPaymentDate": timestamp_to_date(tv.get("dividend_payment_date_upcoming")),
+        "revenueHistory": history[:8],
+        "consecutiveRevenueGrowthYears": revenue_streak(history) if len(history) >= 2 else None,
     }
 
 
 def pass_flags(record):
-    flags = non_revenue_flags(record)
-    flags["revenue"] = record.get("consecutiveRevenueGrowthYears") is not None and record["consecutiveRevenueGrowthYears"] >= MIN_REVENUE_YEARS
-    return {k: flags[k] for k in ("revenue", "roa", "dividend", "debt", "pe")}
+    return {
+        "revenue": record.get("consecutiveRevenueGrowthYears") is not None and record["consecutiveRevenueGrowthYears"] >= MIN_REVENUE_YEARS,
+        "roa": record.get("roaPct") is not None and record["roaPct"] >= MIN_ROA,
+        "dividend": True,
+        "debt": record.get("netDebtToEbitda") is not None and record["netDebtToEbitda"] < MAX_NET_DEBT_EBITDA,
+        "pe": record.get("pe") is not None and record["pe"] > 0 and record["pe"] < MAX_PE,
+    }
 
 
 def score_record(record):
@@ -253,16 +304,16 @@ def write_failure(message):
     try:
         previous = json.loads(OUTPUT_PATH.read_text()) if OUTPUT_PATH.exists() else None
     except Exception:
-        previous = None
+        pass
     keep_previous = previous and previous.get("status") == "ok"
     OUTPUT_PATH.write_text(json.dumps({
         "generatedAt": dt.datetime.now(dt.timezone.utc).isoformat(),
         "status": "error",
         "error": message,
         "method": "Doc's Formula for Buying Winning Stocks",
-        "universe": "S&P U.S. Dividend Growers / VIG holdings (10+ consecutive years of dividend growth)",
-        "universeCount": 0,
-        "screenedCount": 0,
+        "universe": "Nasdaq US Broad Dividend Achievers (10+ consecutive years of dividend growth)",
+        "universeCount": previous.get("universeCount", 0) if keep_previous else 0,
+        "screenedCount": previous.get("screenedCount", 0) if keep_previous else 0,
         "winnerCount": len(previous.get("winners", [])) if keep_previous else 0,
         "criteria": criteria_payload(),
         "winners": previous.get("winners", []) if keep_previous else [],
@@ -272,82 +323,71 @@ def write_failure(message):
 
 
 def main():
-    if not FINNHUB_API_KEY:
-        raise RuntimeError("FINNHUB_API_KEY is not configured for the opportunity screen.")
-    universe = fetch_dividend_growth_universe()
-    print(f"Loaded {len(universe)} dividend-growth stocks")
+    universe, universe_source = fetch_dividend_growth_universe()
+    print(f"Loaded {len(universe)} dividend achievers from {universe_source}")
 
-    records, metric_errors = [], []
-    for idx, base in enumerate(universe, 1):
-        try:
-            metric = fetch_finnhub_metric(base["symbol"])
-            record = {**base, **metric}
-        except Exception as exc:
-            record = {**base, "metricError": str(exc)}
-        record["dividendGrowthYears"] = MIN_DIVIDEND_YEARS
-        record["dividendGrowthYearsIsFloor"] = True
-        record["nonRevenuePassCount"] = sum(non_revenue_flags(record).values())
-        records.append(record)
-        if record.get("metricError"):
-            metric_errors.append(record)
-        if idx % 25 == 0 or idx == len(universe):
-            print(f"Finnhub fundamentals: {idx}/{len(universe)}")
-        time.sleep(REQUEST_DELAY)
+    market = fetch_tradingview_market()
+    print(f"Loaded {len(market)} U.S. market symbols from bulk fundamentals feed")
 
-    # Dividend is already a pass. A stock needs at least two of the remaining
-    # ROA/debt/P-E rules to have a chance at being a 4/5 near miss or 5/5 pass.
-    deep_candidates = [r for r in records if r.get("nonRevenuePassCount", 0) >= 3]
-    print(f"SEC revenue checks required for {len(deep_candidates)} candidates")
-    cik_map = load_sec_ticker_map()
-
-    evaluated, revenue_errors = [], []
-    for idx, record in enumerate(deep_candidates, 1):
-        values, error = revenue_history_from_sec(record["symbol"], cik_map)
-        record["revenueHistory"] = values[:6]
-        record["consecutiveRevenueGrowthYears"] = revenue_streak(values) if values else None
-        record["revenueError"] = error
+    evaluated = []
+    unmatched = []
+    incomplete = []
+    for base in universe:
+        tv = market.get(base["symbol"]) or market.get(base["symbol"].replace(".", "-"))
+        if not tv:
+            unmatched.append(base["symbol"])
+            continue
+        record = make_record(base, tv)
         flags, passed, score = score_record(record)
         record["passes"] = flags
         record["passCount"] = passed
         record["score"] = score
-        record["dataComplete"] = error is None
-        record["meetsFormula"] = error is None and passed == 5
+        record["meetsFormula"] = passed == 5
+        record["dataComplete"] = all([
+            record.get("pe") is not None,
+            record.get("roaPct") is not None,
+            record.get("netDebtToEbitda") is not None,
+            record.get("consecutiveRevenueGrowthYears") is not None,
+        ])
+        if not record["dataComplete"]:
+            incomplete.append(record["symbol"])
         evaluated.append(record)
-        if error:
-            revenue_errors.append(record)
-        if idx % 20 == 0 or idx == len(deep_candidates):
-            print(f"SEC revenue checks: {idx}/{len(deep_candidates)}")
-        time.sleep(0.12)
 
     complete = [r for r in evaluated if r.get("dataComplete")]
-    winners = sorted([r for r in complete if r.get("meetsFormula")], key=lambda r: (-r.get("score", 0), r.get("pe") or 999, r["symbol"]))
-    near = sorted([r for r in complete if r.get("passCount") == 4], key=lambda r: (-r.get("score", 0), r.get("pe") or 999, r["symbol"]))
+    winners = sorted(
+        [r for r in complete if r.get("meetsFormula")],
+        key=lambda r: (-r.get("score", 0), r.get("pe") or 999, r["symbol"]),
+    )
+    near = sorted(
+        [r for r in complete if r.get("passCount") == 4],
+        key=lambda r: (-r.get("score", 0), r.get("pe") or 999, r["symbol"]),
+    )
 
     output = {
         "generatedAt": dt.datetime.now(dt.timezone.utc).isoformat(),
         "status": "ok",
         "method": "Doc's Formula for Buying Winning Stocks",
-        "universe": "S&P U.S. Dividend Growers / VIG holdings (10+ consecutive years of dividend growth)",
-        "marketStockCount": len(records),
+        "universe": "Nasdaq US Broad Dividend Achievers (10+ consecutive years of dividend growth)",
+        "universeSource": universe_source,
         "universeCount": len(universe),
+        "matchedCount": len(evaluated),
         "screenedCount": len(complete),
-        "deepCandidateCount": len(deep_candidates),
         "winnerCount": len(winners),
         "criteria": criteria_payload(),
         "winners": winners[:25],
         "nearMisses": near[:25],
-        "metricErrorCount": len(metric_errors),
-        "revenueErrorCount": len(revenue_errors),
+        "unmatchedCount": len(unmatched),
+        "incompleteCount": len(incomplete),
         "sourceNotes": [
-            "Dividend-growth universe: current VIG holdings, tracking the S&P U.S. Dividend Growers Index (10+ consecutive years of dividend growth).",
-            "P/E and ROA: Finnhub basic financials.",
-            "Net debt/EBITDA: Finnhub net debt and EBITDA/share inputs; enterprise value minus market cap is used when direct net debt is unavailable.",
-            "Revenue streak: annual revenue reported in SEC 10-K filings via SEC companyfacts.",
-            "The S&P U.S. Dividend Growers Index excludes the highest-yielding 25% of otherwise eligible companies, so this is a broad quality-growth universe rather than every U.S. dividend stock."
+            "Dividend-growth universe: Nasdaq US Broad Dividend Achievers, whose constituents have at least 10 consecutive years of increasing annual regular dividends.",
+            "P/E, ROA, net debt, EBITDA, annual revenue history, dividend yield and upcoming dividend dates: TradingView U.S. stock screener fundamentals.",
+            "Net debt/EBITDA is calculated as net debt divided by trailing EBITDA.",
+            "Revenue-growth streak counts consecutive annual revenue increases from the latest completed fiscal year backward.",
+            "The dividend-growth-years value is displayed as a 10+ year floor because index membership establishes the minimum rather than the exact streak length."
         ],
     }
     OUTPUT_PATH.write_text(json.dumps(output, indent=2))
-    print(f"Wrote {OUTPUT_PATH}: {len(winners)} winners, {len(near)} near misses")
+    print(f"Wrote {OUTPUT_PATH}: {len(winners)} 5/5 winners, {len(near)} 4/5 near misses, {len(incomplete)} incomplete")
 
 
 if __name__ == "__main__":
