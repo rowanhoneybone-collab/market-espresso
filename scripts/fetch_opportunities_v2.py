@@ -34,6 +34,8 @@ HTTP.headers.update({
 
 TV_COLUMNS = [
     "market_cap_basic",
+    "close",
+    "sector",
     "price_earnings_current",
     "return_on_assets",
     "net_debt",
@@ -45,6 +47,29 @@ TV_COLUMNS = [
     "dividend_amount_upcoming",
     "dividend_payment_date_upcoming",
 ]
+
+SECTOR_MAP = {
+    "Energy Minerals": "Energy",
+    "Health Technology": "Healthcare",
+    "Health Services": "Healthcare",
+    "Producer Manufacturing": "Produced Goods / Industrials",
+    "Industrial Services": "Produced Goods / Industrials",
+    "Distribution Services": "Produced Goods / Industrials",
+    "Transportation": "Produced Goods / Industrials",
+    "Electronic Technology": "Technology",
+    "Technology Services": "Technology",
+    "Finance": "Financials",
+    "Consumer Non-Durables": "Consumer",
+    "Consumer Durables": "Consumer",
+    "Consumer Services": "Consumer",
+    "Retail Trade": "Consumer",
+    "Utilities": "Utilities",
+    "Process Industries": "Materials",
+    "Non-Energy Minerals": "Materials",
+    "Communications": "Communications",
+    "Commercial Services": "Business Services",
+    "Miscellaneous": "Other",
+}
 
 
 def safe_num(value):
@@ -61,6 +86,13 @@ def normalize_symbol(symbol):
     return str(symbol or "").upper().strip().replace("/", ".").replace(" ", "")
 
 
+def friendly_sector(raw):
+    raw = str(raw or "").strip()
+    if not raw:
+        return "Other"
+    return SECTOR_MAP.get(raw, raw)
+
+
 def get_bytes(url, timeout=35):
     response = HTTP.get(url, timeout=timeout)
     response.raise_for_status()
@@ -74,7 +106,6 @@ def get_text(url, timeout=35):
 def parse_nasdaq_achievers_pdf(raw):
     reader = PdfReader(io.BytesIO(raw))
     rows = []
-    # Nasdaq rows extract as: COMPANY NAME TICKER WEIGHT.
     pattern = re.compile(r"^(.*?)\s+([A-Z][A-Z0-9.\-]{0,11})\s+([0-9]+(?:\.[0-9]+)?)$")
     for page in reader.pages:
         text = page.extract_text() or ""
@@ -244,9 +275,13 @@ def make_record(base, tv):
             history = [latest_revenue]
         elif abs(history[0] - latest_revenue) / max(abs(latest_revenue), 1) > 0.01:
             history.insert(0, latest_revenue)
+    raw_sector = str(tv.get("sector") or "").strip()
     return {
         **base,
         "exchangeSymbol": tv.get("exchangeSymbol"),
+        "currentPrice": safe_num(tv.get("close")),
+        "sectorRaw": raw_sector or None,
+        "sector": friendly_sector(raw_sector),
         "pe": pe,
         "roaPct": roa,
         "marketCap": safe_num(tv.get("market_cap_basic")),
@@ -299,6 +334,12 @@ def criteria_payload():
     }
 
 
+def universe_label(source):
+    if "Nasdaq" in str(source or ""):
+        return "Nasdaq US Broad Dividend Achievers (10+ consecutive years of dividend growth)"
+    return "U.S. Dividend Achievers (10+ consecutive years of dividend growth)"
+
+
 def write_failure(message):
     previous = None
     try:
@@ -311,13 +352,14 @@ def write_failure(message):
         "status": "error",
         "error": message,
         "method": "Doc's Formula for Buying Winning Stocks",
-        "universe": "Nasdaq US Broad Dividend Achievers (10+ consecutive years of dividend growth)",
+        "universe": previous.get("universe", "U.S. Dividend Achievers (10+ consecutive years of dividend growth)") if keep_previous else "U.S. Dividend Achievers (10+ consecutive years of dividend growth)",
         "universeCount": previous.get("universeCount", 0) if keep_previous else 0,
         "screenedCount": previous.get("screenedCount", 0) if keep_previous else 0,
         "winnerCount": len(previous.get("winners", [])) if keep_previous else 0,
         "criteria": criteria_payload(),
         "winners": previous.get("winners", []) if keep_previous else [],
         "nearMisses": previous.get("nearMisses", []) if keep_previous else [],
+        "screenedStocks": previous.get("screenedStocks", []) if keep_previous else [],
         "previousGeneratedAt": previous.get("generatedAt") if keep_previous else None,
     }, indent=2))
 
@@ -362,28 +404,39 @@ def main():
         [r for r in complete if r.get("passCount") == 4],
         key=lambda r: (-r.get("score", 0), r.get("pe") or 999, r["symbol"]),
     )
+    searchable = sorted(
+        complete,
+        key=lambda r: (-r.get("passCount", 0), -r.get("score", 0), r["symbol"]),
+    )
+
+    sector_counts = {}
+    for record in winners:
+        sector = record.get("sector") or "Other"
+        sector_counts[sector] = sector_counts.get(sector, 0) + 1
 
     output = {
         "generatedAt": dt.datetime.now(dt.timezone.utc).isoformat(),
         "status": "ok",
         "method": "Doc's Formula for Buying Winning Stocks",
-        "universe": "Nasdaq US Broad Dividend Achievers (10+ consecutive years of dividend growth)",
+        "universe": universe_label(universe_source),
         "universeSource": universe_source,
         "universeCount": len(universe),
         "matchedCount": len(evaluated),
         "screenedCount": len(complete),
         "winnerCount": len(winners),
         "criteria": criteria_payload(),
-        "winners": winners[:25],
-        "nearMisses": near[:25],
+        "sectorCounts": dict(sorted(sector_counts.items(), key=lambda item: (-item[1], item[0]))),
+        "winners": winners,
+        "nearMisses": near,
+        "screenedStocks": searchable,
         "unmatchedCount": len(unmatched),
         "incompleteCount": len(incomplete),
         "sourceNotes": [
-            "Dividend-growth universe: Nasdaq US Broad Dividend Achievers, whose constituents have at least 10 consecutive years of increasing annual regular dividends.",
-            "P/E, ROA, net debt, EBITDA, annual revenue history, dividend yield and upcoming dividend dates: TradingView U.S. stock screener fundamentals.",
+            f"Dividend-growth universe: {universe_label(universe_source)}.",
+            "Current price, sector, P/E, ROA, net debt, EBITDA, annual revenue history, dividend yield and upcoming dividend dates: TradingView U.S. stock screener fundamentals.",
             "Net debt/EBITDA is calculated as net debt divided by trailing EBITDA.",
             "Revenue-growth streak counts consecutive annual revenue increases from the latest completed fiscal year backward.",
-            "The dividend-growth-years value is displayed as a 10+ year floor because index membership establishes the minimum rather than the exact streak length."
+            "The dividend-growth-years value is displayed as a 10+ year floor because universe membership establishes the minimum rather than the exact streak length."
         ],
     }
     OUTPUT_PATH.write_text(json.dumps(output, indent=2))
