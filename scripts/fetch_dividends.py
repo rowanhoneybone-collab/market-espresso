@@ -3,6 +3,7 @@ import concurrent.futures
 import datetime as dt
 import json
 import re
+import statistics
 import urllib.parse
 import urllib.request
 from pathlib import Path
@@ -15,8 +16,6 @@ config = json.loads(CONFIG_PATH.read_text())
 watchlist = config.get("dividendWatchlist", [])
 tracked = {item["symbol"].upper(): item for item in watchlist}
 today = dt.date.today()
-lookback_days = 45
-lookahead_days = 120
 
 BROWSER_HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
@@ -28,7 +27,7 @@ BROWSER_HEADERS = {
 }
 
 
-def get_json(url, headers=None, timeout=20):
+def get_json(url, headers=None, timeout=18):
     req_headers = {"User-Agent": "MarketEspresso/1.0"}
     if headers:
         req_headers.update(headers)
@@ -70,37 +69,6 @@ def parse_number(value):
         return None
 
 
-def fetch_calendar_day(day):
-    url = "https://api.nasdaq.com/api/calendar/dividends?" + urllib.parse.urlencode({"date": day.isoformat()})
-    try:
-        payload = get_json(url, headers=BROWSER_HEADERS, timeout=20)
-        calendar = (((payload or {}).get("data") or {}).get("calendar") or {})
-        rows = calendar.get("rows") or []
-        matches = []
-        for row in rows:
-            if not isinstance(row, dict):
-                continue
-            symbol = str(row.get("symbol") or "").upper().strip()
-            if symbol not in tracked:
-                continue
-            matches.append({
-                "symbol": symbol,
-                "name": row.get("companyName") or tracked[symbol].get("name", symbol),
-                "amount": parse_number(row.get("dividend_Rate")),
-                "currency": "USD",
-                "declarationDate": iso_date(row.get("announcement_Date")),
-                "exDate": iso_date(row.get("dividend_Ex_Date")) or day.isoformat(),
-                "recordDate": iso_date(row.get("record_Date")),
-                "payDate": iso_date(row.get("payment_Date")),
-                "annualizedDividend": parse_number(row.get("indicated_Annual_Dividend")),
-                "source": "Nasdaq Dividend Calendar"
-            })
-        return matches
-    except Exception as exc:
-        print(f"Nasdaq dividend calendar {day}: {exc}")
-        return []
-
-
 def fetch_yahoo_history(symbol):
     encoded = urllib.parse.quote(symbol)
     url = (
@@ -111,7 +79,7 @@ def fetch_yahoo_history(symbol):
         "User-Agent": BROWSER_HEADERS["User-Agent"],
         "Accept": "application/json, text/plain, */*"
     }
-    payload = get_json(url, headers=headers, timeout=20)
+    payload = get_json(url, headers=headers, timeout=18)
     result = ((((payload or {}).get("chart") or {}).get("result") or [None])[0]) or {}
     meta = result.get("meta") or {}
     price = parse_number(meta.get("regularMarketPrice"))
@@ -141,12 +109,81 @@ def fetch_yahoo_history(symbol):
     return history, price
 
 
-calendar_dates = [
-    today + dt.timedelta(days=offset)
-    for offset in range(-lookback_days, lookahead_days + 1)
-]
+def predicted_calendar_dates(history):
+    dates = [parse_date(event.get("exDate")) for event in history[:6]]
+    dates = [date for date in dates if date]
+    checks = set(dates[:2])
+    if len(dates) >= 2:
+        intervals = []
+        for idx in range(min(len(dates) - 1, 4)):
+            gap = (dates[idx] - dates[idx + 1]).days
+            if 20 <= gap <= 190:
+                intervals.append(gap)
+        if intervals:
+            cadence = max(20, round(statistics.median(intervals)))
+            predicted = dates[0] + dt.timedelta(days=cadence)
+            while predicted < today - dt.timedelta(days=8):
+                predicted += dt.timedelta(days=cadence)
+            for offset in range(-8, 9):
+                checks.add(predicted + dt.timedelta(days=offset))
+    return {date for date in checks if today - dt.timedelta(days=75) <= date <= today + dt.timedelta(days=140)}
+
+
+def fetch_calendar_day(day):
+    url = "https://api.nasdaq.com/api/calendar/dividends?" + urllib.parse.urlencode({"date": day.isoformat()})
+    try:
+        payload = get_json(url, headers=BROWSER_HEADERS, timeout=18)
+        calendar = (((payload or {}).get("data") or {}).get("calendar") or {})
+        rows = calendar.get("rows") or []
+        matches = []
+        for row in rows:
+            if not isinstance(row, dict):
+                continue
+            symbol = str(row.get("symbol") or "").upper().strip()
+            if symbol not in tracked:
+                continue
+            matches.append({
+                "symbol": symbol,
+                "name": row.get("companyName") or tracked[symbol].get("name", symbol),
+                "amount": parse_number(row.get("dividend_Rate")),
+                "currency": "USD",
+                "declarationDate": iso_date(row.get("announcement_Date")),
+                "exDate": iso_date(row.get("dividend_Ex_Date")) or day.isoformat(),
+                "recordDate": iso_date(row.get("record_Date")),
+                "payDate": iso_date(row.get("payment_Date")),
+                "annualizedDividend": parse_number(row.get("indicated_Annual_Dividend")),
+                "source": "Nasdaq Dividend Calendar"
+            })
+        return matches
+    except Exception as exc:
+        print(f"Nasdaq dividend calendar {day}: {exc}")
+        return []
+
+
+history_by_symbol = {}
+price_by_symbol = {}
+history_errors = {}
+for symbol in tracked:
+    try:
+        history, price = fetch_yahoo_history(symbol)
+        history_by_symbol[symbol] = history
+        price_by_symbol[symbol] = price
+    except Exception as exc:
+        history_by_symbol[symbol] = []
+        price_by_symbol[symbol] = None
+        history_errors[symbol] = str(exc)
+        print(f"Yahoo dividend history {symbol}: {exc}")
+
+calendar_dates = set()
+for history in history_by_symbol.values():
+    calendar_dates.update(predicted_calendar_dates(history))
+# Always check today and a few nearby dates for newly announced near-term events.
+for offset in range(0, 8):
+    calendar_dates.add(today + dt.timedelta(days=offset))
+calendar_dates = sorted(calendar_dates)
+
 calendar_events = []
-with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
+with concurrent.futures.ThreadPoolExecutor(max_workers=6) as pool:
     for matches in pool.map(fetch_calendar_day, calendar_dates):
         calendar_events.extend(matches)
 
@@ -154,21 +191,16 @@ calendar_by_symbol = {symbol: [] for symbol in tracked}
 for event in calendar_events:
     calendar_by_symbol[event["symbol"]].append(event)
 for events in calendar_by_symbol.values():
-    events.sort(key=lambda event: event.get("exDate") or "9999-12-31")
+    unique = {event.get("exDate"): event for event in events if event.get("exDate")}
+    events[:] = sorted(unique.values(), key=lambda event: event.get("exDate") or "9999-12-31")
 
 records = []
 trailing_start = today - dt.timedelta(days=365)
 for symbol, cfg in tracked.items():
-    history = []
-    price = None
-    history_error = None
-    try:
-        history, price = fetch_yahoo_history(symbol)
-    except Exception as exc:
-        history_error = str(exc)
-        print(f"Yahoo dividend history {symbol}: {exc}")
-
+    history = history_by_symbol.get(symbol, [])
+    price = price_by_symbol.get(symbol)
     confirmed_events = calendar_by_symbol.get(symbol, [])
+
     future_ex = [
         event for event in confirmed_events
         if parse_date(event.get("exDate")) and parse_date(event.get("exDate")) >= today
@@ -201,7 +233,6 @@ for symbol, cfg in tracked.items():
         trailing_yield = trailing_total / price * 100
 
     recent = history[:6]
-    # Prefer richer calendar details when they overlap a recent historical event.
     for idx, event in enumerate(recent):
         match = next((c for c in confirmed_events if c.get("exDate") == event.get("exDate")), None)
         if match:
@@ -222,14 +253,13 @@ for symbol, cfg in tracked.items():
         "trailingYieldPct": round(trailing_yield, 4) if trailing_yield is not None else None,
         "annualizedDividend": (next_event or {}).get("annualizedDividend") if next_event else None,
         "historyPrice": price,
-        "historyError": history_error
+        "historyError": history_errors.get(symbol)
     })
 
 output = {
     "generatedAt": dt.datetime.now(dt.timezone.utc).isoformat(),
-    "lookbackDays": lookback_days,
-    "lookaheadDays": lookahead_days,
+    "calendarDatesChecked": len(calendar_dates),
     "records": records
 }
 OUTPUT_PATH.write_text(json.dumps(output, indent=2))
-print(f"Wrote {OUTPUT_PATH} with {len(records)} tracked dividend names and {len(calendar_events)} matching calendar events")
+print(f"Wrote {OUTPUT_PATH}: {len(records)} tracked names, {len(calendar_dates)} calendar dates checked, {len(calendar_events)} matched events")
