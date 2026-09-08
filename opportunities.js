@@ -9,6 +9,11 @@
     const d = new Date(value);
     return Number.isNaN(d.getTime()) ? "—" : d.toLocaleString(undefined,{month:"short",day:"numeric",year:"numeric",hour:"numeric",minute:"2-digit"});
   };
+  const dateOnly = value => {
+    if(!value) return "—";
+    const d = new Date(`${value}T12:00:00`);
+    return Number.isNaN(d.getTime()) ? "—" : d.toLocaleDateString(undefined,{month:"short",day:"numeric"});
+  };
 
   function criterion(label, value, note){
     return `<article class="formulaCard"><label>${esc(label)}</label><strong>${esc(value)}</strong><p>${esc(note)}</p></article>`;
@@ -28,18 +33,27 @@
     return `<span class="ruleDot ${ok ? "pass" : "fail"}">${ok ? "✓" : "×"} ${esc(text)}</span>`;
   }
 
+  function incomeCell(record){
+    const yieldText = pct(record.dividendYieldPct);
+    const exText = record.nextExDate ? dateOnly(record.nextExDate) : "Awaiting date";
+    const amount = record.nextDividendAmount == null ? "" : ` · $${num(record.nextDividendAmount,2)}`;
+    return `<b>${yieldText}</b><small>Ex-div: ${esc(exText)}${amount}</small>`;
+  }
+
   function row(record, near=false){
     const p = record.passes || {};
     const failed = Object.entries(p).filter(([,ok]) => !ok).map(([key]) => key);
     const failLabel = {revenue:"Revenue streak",roa:"ROA",dividend:"Dividend streak",debt:"Net debt/EBITDA",pe:"P/E"};
+    const divYears = record.dividendGrowthYears == null ? "—" : `${Math.round(record.dividendGrowthYears)}${record.dividendGrowthYearsIsFloor ? "+" : ""} yrs`;
     return `<tr>
       <td><b>${esc(record.symbol)}</b><small>${esc(record.name || "")}</small></td>
       <td>${near ? `<span class="badge waiting">4 / 5</span><small>${esc(failed.map(k=>failLabel[k]||k).join(", "))}</small>` : `<span class="badge confirmed">5 / 5</span>`}</td>
       <td>${record.consecutiveRevenueGrowthYears == null ? "—" : `${record.consecutiveRevenueGrowthYears} yrs`}</td>
       <td>${pct(record.roaPct)}</td>
-      <td>${record.dividendGrowthYears == null ? "—" : `${Math.round(record.dividendGrowthYears)} yrs`}</td>
+      <td>${esc(divYears)}</td>
       <td>${ratio(record.netDebtToEbitda)}</td>
       <td>${num(record.pe)}</td>
+      <td>${incomeCell(record)}</td>
       <td><div class="ruleStrip">${passDot(p.revenue,"Rev")}${passDot(p.roa,"ROA")}${passDot(p.dividend,"Div")}${passDot(p.debt,"Debt")}${passDot(p.pe,"P/E")}</div></td>
     </tr>`;
   }
@@ -70,17 +84,17 @@
 
     const winners = data.winners || [];
     $("opportunityWinners").innerHTML = winners.length ? `
-      <div class="tableWrap"><table class="opTable"><thead><tr><th>Stock</th><th>Score</th><th>Revenue Growth</th><th>ROA</th><th>Dividend Growth</th><th>Net Debt/EBITDA</th><th>P/E</th><th>Rules</th></tr></thead>
+      <div class="tableWrap"><table class="opTable"><thead><tr><th>Stock</th><th>Score</th><th>Revenue Growth</th><th>ROA</th><th>Dividend Growth</th><th>Net Debt/EBITDA</th><th>P/E</th><th>Income</th><th>Rules</th></tr></thead>
       <tbody>${winners.map(r => row(r,false)).join("")}</tbody></table></div>`
       : `<div class="emptyState"><b>No stocks currently clear all five filters.</b><p>That is a valid screen result—not a signal to weaken the rules. Near misses are shown below.</p></div>`;
 
     const near = data.nearMisses || [];
     $("opportunityNearMisses").innerHTML = near.length ? `
-      <div class="tableWrap"><table class="opTable"><thead><tr><th>Stock</th><th>Score</th><th>Revenue Growth</th><th>ROA</th><th>Dividend Growth</th><th>Net Debt/EBITDA</th><th>P/E</th><th>Rules</th></tr></thead>
+      <div class="tableWrap"><table class="opTable"><thead><tr><th>Stock</th><th>Score</th><th>Revenue Growth</th><th>ROA</th><th>Dividend Growth</th><th>Net Debt/EBITDA</th><th>P/E</th><th>Income</th><th>Rules</th></tr></thead>
       <tbody>${near.map(r => row(r,true)).join("")}</tbody></table></div>`
       : `<div class="emptyState"><b>No 4-of-5 near misses loaded.</b></div>`;
 
-    $("opportunitySource").textContent = `Universe: ${data.universe || "10+ year dividend growers"}. Net debt/EBITDA is calculated as (total debt − cash) ÷ EBITDA. This is a research screen, not a buy list.`;
+    $("opportunitySource").textContent = `Universe: ${data.universe || "10+ year dividend growers"}. Net debt/EBITDA is calculated as net debt ÷ trailing EBITDA. The Income column shows the current indicated dividend yield and a confirmed upcoming ex-date when the data feed has one. This is a research screen, not a buy list.`;
   }
 
   async function loadOpportunities(){
