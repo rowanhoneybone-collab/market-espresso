@@ -175,30 +175,35 @@ function renderPortfolio(){
 function renderDividends(){
   const rows = edition.dividends || [];
   const tracked = cfgDividendWatchlist();
-  const confirmed = rows.filter(x => x?.next);
-  const nextSorted = confirmed.slice().sort((a,b) => {
-    const ad = a.next?.exDate || a.next?.payDate || "9999-12-31";
-    const bd = b.next?.exDate || b.next?.payDate || "9999-12-31";
+  const scheduled = rows.filter(x => x?.next);
+  const futureEx = rows.filter(item => item?.status === "Confirmed" && item?.next?.exDate && (daysUntil(item.next.exDate) ?? -1) >= 0);
+  const nextExSorted = futureEx.slice().sort((a,b) => String(a.next.exDate).localeCompare(String(b.next.exDate)));
+  const nextOne = nextExSorted[0];
+  const scheduleSorted = scheduled.slice().sort((a,b) => {
+    const aEx = a.status === "Confirmed" && a.next?.exDate && (daysUntil(a.next.exDate) ?? -1) >= 0;
+    const bEx = b.status === "Confirmed" && b.next?.exDate && (daysUntil(b.next.exDate) ?? -1) >= 0;
+    const ad = aEx ? a.next.exDate : (a.next?.payDate || "9999-12-31");
+    const bd = bEx ? b.next.exDate : (b.next?.payDate || "9999-12-31");
     return String(ad).localeCompare(String(bd));
   });
-  const nextOne = nextSorted[0];
 
   document.getElementById("dividendSummary").innerHTML = `
     <article><label>TRACKED NAMES</label><strong>${tracked.length}</strong><span>Configured dividend watchlist</span></article>
-    <article><label>CONFIRMED NEXT PAYOUT</label><strong>${confirmed.length}</strong><span>Declared upcoming events found</span></article>
+    <article><label>ACTIVE DIVIDEND SCHEDULES</label><strong>${scheduled.length}</strong><span>Future ex-dates or payments currently posted</span></article>
     <article><label>NEXT EX-DIVIDEND DATE</label><strong>${nextOne?.next?.exDate ? fmtDate(nextOne.next.exDate) : "—"}</strong><span>${nextOne ? esc(nextOne.symbol) : "Waiting for a new declaration"}</span></article>
   `;
 
-  document.getElementById("dividendCalendar").innerHTML = nextSorted.length ? `
+  document.getElementById("dividendCalendar").innerHTML = scheduleSorted.length ? `
     <div class="tableWrap"><table class="divTable">
       <thead><tr><th>Stock</th><th>Status</th><th>Amount</th><th>Ex-Date</th><th>Pay Date</th><th>Declaration</th></tr></thead>
-      <tbody>${nextSorted.map(item => {
+      <tbody>${scheduleSorted.map(item => {
         const d = item.next || {};
         const countdown = daysUntil(d.exDate);
-        const countdownText = countdown == null ? "" : countdown === 0 ? " • today" : countdown > 0 ? ` • ${countdown}d` : "";
+        const countdownText = countdown == null ? "" : countdown === 0 ? " • today" : countdown > 0 ? ` • ${countdown}d` : " • cutoff passed";
+        const statusClass = item.status === "Confirmed" ? "confirmed" : "waiting";
         return `<tr>
           <td><b>${esc(item.symbol)}</b><small>${esc(item.name || "")}</small></td>
-          <td><span class="badge confirmed">Confirmed</span></td>
+          <td><span class="badge ${statusClass}">${esc(item.status || "Scheduled")}</span></td>
           <td>${fmtAmount(d.amount,d.currency)}</td>
           <td>${fmtDate(d.exDate)}<small>${countdownText}</small></td>
           <td>${fmtDate(d.payDate)}</td>
@@ -206,7 +211,7 @@ function renderDividends(){
         </tr>`;
       }).join("")}</tbody>
     </table></div>`
-    : `<div class="emptyState"><b>No confirmed upcoming dividend is currently published for the tracked names.</b><p>The watchlist below will stay visible and switch to “Confirmed” when a future dividend appears in the refreshed data.</p></div>`;
+    : `<div class="emptyState"><b>No scheduled dividend event is currently published for the tracked names.</b><p>The watchlist below will stay visible and switch to “Confirmed” when a future dividend is posted.</p></div>`;
 
   const rowsBySymbol = Object.fromEntries(rows.map(x => [x.symbol, x]));
   document.getElementById("dividendWatchlistCards").innerHTML = tracked.map(item => {
@@ -216,11 +221,12 @@ function renderDividends(){
     const statusText = d.status || "Waiting for data";
     const yieldText = d.trailingYieldPct == null ? "—" : `${Number(d.trailingYieldPct).toFixed(2)}%`;
     const last = (d.recent || [])[0];
+    const exLabel = d.status === "Payment scheduled" ? "Last ex-date" : "Next ex-date";
     return `<article class="divCard">
       <div class="divCardTop"><div><label>${esc(item.symbol)}</label><h3>${esc(item.name || item.symbol)}</h3></div><span class="badge ${statusClass}">${esc(statusText)}</span></div>
       <div class="divMetrics">
         <div><small>Trailing 12M yield</small><strong>${yieldText}</strong></div>
-        <div><small>Next ex-date</small><strong>${fmtDate(next.exDate)}</strong></div>
+        <div><small>${exLabel}</small><strong>${fmtDate(next.exDate)}</strong></div>
         <div><small>Next payment</small><strong>${fmtDate(next.payDate)}</strong></div>
       </div>
       <p>${esc(item.qualityNote || d.qualityNote || "Dividend watchlist name.")}</p>
