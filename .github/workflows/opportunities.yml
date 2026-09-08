@@ -3,7 +3,7 @@ name: Refresh Dividend Opportunities
 on:
   workflow_dispatch:
   schedule:
-    - cron: "15 13 * * 1"
+    - cron: "15 22 * * 1-5"
   push:
     branches: ["main"]
     paths:
@@ -64,7 +64,8 @@ jobs:
               "winnerCount": 0,
               "criteria": {"minConsecutiveRevenueYears":3,"minRoaPct":10,"minDividendGrowthYears":10,"maxNetDebtToEbitda":4,"maxPe":25},
               "winners": [],
-              "nearMisses": []
+              "nearMisses": [],
+              "screenedStocks": []
           }, indent=2))
           PY
           fi
@@ -95,7 +96,14 @@ jobs:
               raise SystemExit(f"Opportunity screen did not complete: {data.get('error', 'unknown error')}")
           if int(data.get("screenedCount", 0)) < 1:
               raise SystemExit("Opportunity screen returned no complete stock records.")
-          print(f"Validated {data.get('screenedCount')} complete records and {data.get('winnerCount', 0)} 5/5 passes.")
+          if len(data.get("screenedStocks", [])) < 100:
+              raise SystemExit("Searchable opportunity universe is unexpectedly small.")
+          winners = data.get("winners", [])
+          if winners and not any(stock.get("currentPrice") is not None for stock in winners):
+              raise SystemExit("Opportunity matches are missing current-price data.")
+          if winners and not any(stock.get("sector") for stock in winners):
+              raise SystemExit("Opportunity matches are missing sector data.")
+          print(f"Validated {data.get('screenedCount')} complete records and {data.get('winnerCount', 0)} 5/5 passes with sector, search and price data.")
           PY
 
       - name: Save opportunity snapshot
