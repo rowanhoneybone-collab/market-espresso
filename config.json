@@ -5,89 +5,38 @@
     {"symbol": "DIA", "name": "Dow", "showInTicker": true}
   ],
   "holdings": [
-    {
-      "symbol": "VOO",
-      "name": "VOO",
-      "showInTicker": true,
-      "news": false,
-      "themes": ["core"],
-      "thesis": "Broad U.S. market exposure. A simple long-term anchor."
-    },
-    {
-      "symbol": "TEM",
-      "name": "TEM",
-      "showInTicker": true,
-      "news": true,
-      "themes": ["ai", "healthcare"],
-      "thesis": "Healthcare + AI growth. Watch revenue growth and the path to profit."
-    },
-    {
-      "symbol": "ITW",
-      "name": "ITW",
-      "showInTicker": false,
-      "news": true,
-      "themes": ["industrial", "dividend"],
-      "thesis": "High-quality industrial compounder. Watch margins, cash flow and dividend growth."
-    },
-    {
-      "symbol": "BP",
-      "name": "BP",
-      "showInTicker": true,
-      "news": true,
-      "themes": ["energy", "dividend"],
-      "thesis": "Energy income + oil exposure. Watch debt, operations and commodity prices."
-    },
-    {
-      "symbol": "TTE",
-      "name": "TTE",
-      "showInTicker": true,
-      "news": true,
-      "themes": ["energy", "dividend"],
-      "thesis": "Integrated energy + dividends. Watch oil/LNG and shareholder returns."
-    },
-    {
-      "symbol": "SONY",
-      "name": "SONY",
-      "showInTicker": false,
-      "news": true,
-      "themes": ["consumer", "technology"],
-      "thesis": "Gaming, entertainment and technology. Watch PlayStation, media and buybacks."
-    },
-    {
-      "symbol": "AIQ",
-      "name": "AIQ",
-      "showInTicker": false,
-      "news": true,
-      "themes": ["ai"],
-      "thesis": "Diversified AI exposure. Watch AI spending and interest rates."
-    }
+    {"symbol":"VOO","name":"VOO","showInTicker":true,"news":false,"themes":["core"],"thesis":"Broad U.S. market exposure. A simple long-term anchor."},
+    {"symbol":"TEM","name":"TEM","showInTicker":true,"news":true,"themes":["ai","healthcare"],"thesis":"Healthcare + AI growth. Watch revenue growth and the path to profit."},
+    {"symbol":"ITW","name":"ITW","showInTicker":false,"news":true,"themes":["industrial","dividend"],"thesis":"High-quality industrial compounder. Watch margins, cash flow and dividend growth."},
+    {"symbol":"BP","name":"BP","showInTicker":true,"news":true,"themes":["energy","dividend"],"thesis":"Energy income + oil exposure. Watch debt, operations and commodity prices."},
+    {"symbol":"TTE","name":"TTE","showInTicker":true,"news":true,"themes":["energy","dividend"],"thesis":"Integrated energy + dividends. Watch oil/LNG and shareholder returns."},
+    {"symbol":"SONY","name":"SONY","showInTicker":false,"news":true,"themes":["consumer","technology"],"thesis":"Gaming, entertainment and technology. Watch PlayStation, media and buybacks."},
+    {"symbol":"AIQ","name":"AIQ","showInTicker":false,"news":true,"themes":["ai"],"thesis":"Diversified AI exposure. Watch AI spending and interest rates."}
   ],
   "dividendWatchlist": [
-    {
-      "symbol": "ITW",
-      "name": "Illinois Tool Works",
-      "assetClass": "stocks",
-      "qualityNote": "Dividend-growth industrial. Focus on free cash flow, payout sustainability and continued dividend growth."
-    },
-    {
-      "symbol": "BP",
-      "name": "BP",
-      "assetClass": "stocks",
-      "qualityNote": "Energy income holding. The dividend can be attractive, but oil prices, debt and capital discipline matter."
-    },
-    {
-      "symbol": "TTE",
-      "name": "TotalEnergies",
-      "assetClass": "stocks",
-      "qualityNote": "Integrated energy income. Watch oil, LNG, cash flow and the balance between dividends and buybacks."
-    },
-    {
-      "symbol": "VOO",
-      "name": "VOO",
-      "assetClass": "etf",
-      "qualityNote": "Broad-market ETF distributions. Income is diversified across the S&P 500 and can vary quarter to quarter."
-    }
+    {"symbol":"ITW","name":"Illinois Tool Works","assetClass":"stocks","qualityNote":"Dividend-growth industrial. Focus on free cash flow, payout sustainability and continued dividend growth."},
+    {"symbol":"BP","name":"BP","assetClass":"stocks","qualityNote":"Energy income holding. The dividend can be attractive, but oil prices, debt and capital discipline matter."},
+    {"symbol":"TTE","name":"TotalEnergies","assetClass":"stocks","qualityNote":"Integrated energy income. Watch oil, LNG, cash flow and the balance between dividends and buybacks."},
+    {"symbol":"VOO","name":"VOO","assetClass":"etf","qualityNote":"Broad-market ETF distributions. Income is diversified across the S&P 500 and can vary quarter to quarter."}
   ],
+  "dividendOpportunityScreen": {
+    "name": "Doc's Winning Stock Formula",
+    "source": "Bob Taylor email forwarding Dr. David Eifrig's July 2026 formula",
+    "criteria": {
+      "minConsecutiveRevenueYears": 3,
+      "minRoaPct": 10,
+      "minDividendGrowthYears": 10,
+      "maxNetDebtToEbitda": 4,
+      "maxPe": 25
+    },
+    "notes": {
+      "revenue": "Doc said multiple consecutive years. Market Espresso operationalizes this as 3+ completed fiscal years and keeps the threshold configurable.",
+      "roa": "Return on assets must be at least 10%.",
+      "dividend": "Dividend must have grown for at least 10 consecutive years.",
+      "debt": "Net debt-to-EBITDA must be below 4.",
+      "pe": "Trailing P/E must be below 25."
+    }
+  },
   "sections": {
     "energyThemes": ["energy"],
     "aiHealthThemes": ["ai", "healthcare"]
