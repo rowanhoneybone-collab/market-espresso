@@ -1,16 +1,40 @@
 {
-  "generatedAt": "2026-09-08T18:38:15.258763+00:00",
-  "calendarDatesChecked": 50,
+  "generatedAt": "2026-09-08T18:40:22.525356+00:00",
+  "calendarDatesChecked": 41,
   "records": [
     {
       "symbol": "ITW",
       "name": "Illinois Tool Works",
       "qualityNote": "Dividend-growth industrial. Focus on free cash flow, payout sustainability and continued dividend growth.",
-      "source": "Nasdaq Dividend Calendar + Yahoo Finance history",
+      "source": "StockAnalysis forward events + Nasdaq calendar fallback + Yahoo Finance history",
       "dataAvailable": true,
-      "status": "Awaiting next declaration",
-      "next": null,
-      "upcoming": [],
+      "status": "Confirmed",
+      "next": {
+        "symbol": "ITW",
+        "name": "Illinois Tool Works",
+        "amount": 1.72,
+        "currency": "USD",
+        "declarationDate": null,
+        "exDate": "2026-09-30",
+        "recordDate": "2026-09-30",
+        "payDate": "2026-10-09",
+        "annualizedDividend": null,
+        "source": "StockAnalysis dividend history"
+      },
+      "upcoming": [
+        {
+          "symbol": "ITW",
+          "name": "Illinois Tool Works",
+          "amount": 1.72,
+          "currency": "USD",
+          "declarationDate": null,
+          "exDate": "2026-09-30",
+          "recordDate": "2026-09-30",
+          "payDate": "2026-10-09",
+          "annualizedDividend": null,
+          "source": "StockAnalysis dividend history"
+        }
+      ],
       "pendingPayments": [],
       "recent": [
         {
@@ -69,21 +93,46 @@
         }
       ],
       "trailing12m": 6.44,
-      "trailingYieldPct": 2.4037,
+      "trailingYieldPct": 2.4033,
       "annualizedDividend": null,
-      "historyPrice": 267.92,
-      "historyError": null
+      "historyPrice": 267.965,
+      "historyError": null,
+      "forwardError": null
     },
     {
       "symbol": "BP",
       "name": "BP",
       "qualityNote": "Energy income holding. The dividend can be attractive, but oil prices, debt and capital discipline matter.",
-      "source": "Nasdaq Dividend Calendar + Yahoo Finance history",
+      "source": "StockAnalysis forward events + Nasdaq calendar fallback + Yahoo Finance history",
       "dataAvailable": true,
-      "status": "Awaiting next declaration",
-      "next": null,
+      "status": "Payment scheduled",
+      "next": {
+        "symbol": "BP",
+        "name": "BP",
+        "amount": 0.5146,
+        "currency": "USD",
+        "declarationDate": null,
+        "exDate": "2026-08-14",
+        "recordDate": "2026-08-14",
+        "payDate": "2026-09-18",
+        "annualizedDividend": null,
+        "source": "StockAnalysis dividend history"
+      },
       "upcoming": [],
-      "pendingPayments": [],
+      "pendingPayments": [
+        {
+          "symbol": "BP",
+          "name": "BP",
+          "amount": 0.5146,
+          "currency": "USD",
+          "declarationDate": null,
+          "exDate": "2026-08-14",
+          "recordDate": "2026-08-14",
+          "payDate": "2026-09-18",
+          "annualizedDividend": null,
+          "source": "StockAnalysis dividend history"
+        }
+      ],
       "recent": [
         {
           "amount": 0.52,
@@ -141,20 +190,57 @@
         }
       ],
       "trailing12m": 2.017,
-      "trailingYieldPct": 4.5027,
+      "trailingYieldPct": 4.5058,
       "annualizedDividend": null,
-      "historyPrice": 44.795,
-      "historyError": null
+      "historyPrice": 44.765,
+      "historyError": null,
+      "forwardError": null
     },
     {
       "symbol": "TTE",
       "name": "TotalEnergies",
       "qualityNote": "Integrated energy income. Watch oil, LNG, cash flow and the balance between dividends and buybacks.",
-      "source": "Nasdaq Dividend Calendar + Yahoo Finance history",
+      "source": "StockAnalysis forward events + Nasdaq calendar fallback + Yahoo Finance history",
       "dataAvailable": true,
-      "status": "Awaiting next declaration",
-      "next": null,
-      "upcoming": [],
+      "status": "Confirmed",
+      "next": {
+        "symbol": "TTE",
+        "name": "TotalEnergies",
+        "amount": 1.04263,
+        "currency": "USD",
+        "declarationDate": null,
+        "exDate": "2026-09-30",
+        "recordDate": "2026-10-01",
+        "payDate": "2026-10-21",
+        "annualizedDividend": null,
+        "source": "StockAnalysis dividend history"
+      },
+      "upcoming": [
+        {
+          "symbol": "TTE",
+          "name": "TotalEnergies",
+          "amount": 1.04263,
+          "currency": "USD",
+          "declarationDate": null,
+          "exDate": "2026-09-30",
+          "recordDate": "2026-10-01",
+          "payDate": "2026-10-21",
+          "annualizedDividend": null,
+          "source": "StockAnalysis dividend history"
+        },
+        {
+          "symbol": "TTE",
+          "name": "TotalEnergies",
+          "amount": 1.04263,
+          "currency": "USD",
+          "declarationDate": null,
+          "exDate": "2027-01-04",
+          "recordDate": "2027-01-04",
+          "payDate": "2027-01-22",
+          "annualizedDividend": null,
+          "source": "StockAnalysis dividend history"
+        }
+      ],
       "pendingPayments": [],
       "recent": [
         {
@@ -213,16 +299,17 @@
         }
       ],
       "trailing12m": 2.963,
-      "trailingYieldPct": 3.2842,
+      "trailingYieldPct": 3.285,
       "annualizedDividend": null,
-      "historyPrice": 90.22,
-      "historyError": null
+      "historyPrice": 90.197,
+      "historyError": null,
+      "forwardError": null
     },
     {
       "symbol": "VOO",
       "name": "VOO",
       "qualityNote": "Broad-market ETF distributions. Income is diversified across the S&P 500 and can vary quarter to quarter.",
-      "source": "Nasdaq Dividend Calendar + Yahoo Finance history",
+      "source": "StockAnalysis forward events + Nasdaq calendar fallback + Yahoo Finance history",
       "dataAvailable": true,
       "status": "Awaiting next declaration",
       "next": null,
@@ -285,10 +372,11 @@
         }
       ],
       "trailing12m": 7.345,
-      "trailingYieldPct": 1.0412,
+      "trailingYieldPct": 1.0414,
       "annualizedDividend": null,
-      "historyPrice": 705.44,
-      "historyError": null
+      "historyPrice": 705.27,
+      "historyError": null,
+      "forwardError": null
     }
   ]
 }
