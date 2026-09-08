@@ -1,0 +1,294 @@
+{
+  "generatedAt": "2026-09-08T18:38:15.258763+00:00",
+  "calendarDatesChecked": 50,
+  "records": [
+    {
+      "symbol": "ITW",
+      "name": "Illinois Tool Works",
+      "qualityNote": "Dividend-growth industrial. Focus on free cash flow, payout sustainability and continued dividend growth.",
+      "source": "Nasdaq Dividend Calendar + Yahoo Finance history",
+      "dataAvailable": true,
+      "status": "Awaiting next declaration",
+      "next": null,
+      "upcoming": [],
+      "pendingPayments": [],
+      "recent": [
+        {
+          "amount": 1.61,
+          "currency": "USD",
+          "exDate": "2026-06-30",
+          "payDate": null,
+          "recordDate": null,
+          "declarationDate": null,
+          "source": "Yahoo Finance historical distributions"
+        },
+        {
+          "amount": 1.61,
+          "currency": "USD",
+          "exDate": "2026-03-31",
+          "payDate": null,
+          "recordDate": null,
+          "declarationDate": null,
+          "source": "Yahoo Finance historical distributions"
+        },
+        {
+          "amount": 1.61,
+          "currency": "USD",
+          "exDate": "2025-12-31",
+          "payDate": null,
+          "recordDate": null,
+          "declarationDate": null,
+          "source": "Yahoo Finance historical distributions"
+        },
+        {
+          "amount": 1.61,
+          "currency": "USD",
+          "exDate": "2025-09-30",
+          "payDate": null,
+          "recordDate": null,
+          "declarationDate": null,
+          "source": "Yahoo Finance historical distributions"
+        },
+        {
+          "amount": 1.5,
+          "currency": "USD",
+          "exDate": "2025-06-30",
+          "payDate": null,
+          "recordDate": null,
+          "declarationDate": null,
+          "source": "Yahoo Finance historical distributions"
+        },
+        {
+          "amount": 1.5,
+          "currency": "USD",
+          "exDate": "2025-03-31",
+          "payDate": null,
+          "recordDate": null,
+          "declarationDate": null,
+          "source": "Yahoo Finance historical distributions"
+        }
+      ],
+      "trailing12m": 6.44,
+      "trailingYieldPct": 2.4037,
+      "annualizedDividend": null,
+      "historyPrice": 267.92,
+      "historyError": null
+    },
+    {
+      "symbol": "BP",
+      "name": "BP",
+      "qualityNote": "Energy income holding. The dividend can be attractive, but oil prices, debt and capital discipline matter.",
+      "source": "Nasdaq Dividend Calendar + Yahoo Finance history",
+      "dataAvailable": true,
+      "status": "Awaiting next declaration",
+      "next": null,
+      "upcoming": [],
+      "pendingPayments": [],
+      "recent": [
+        {
+          "amount": 0.52,
+          "currency": "USD",
+          "exDate": "2026-08-14",
+          "payDate": null,
+          "recordDate": null,
+          "declarationDate": null,
+          "source": "Yahoo Finance historical distributions"
+        },
+        {
+          "amount": 0.499,
+          "currency": "USD",
+          "exDate": "2026-05-15",
+          "payDate": null,
+          "recordDate": null,
+          "declarationDate": null,
+          "source": "Yahoo Finance historical distributions"
+        },
+        {
+          "amount": 0.499,
+          "currency": "USD",
+          "exDate": "2026-02-20",
+          "payDate": null,
+          "recordDate": null,
+          "declarationDate": null,
+          "source": "Yahoo Finance historical distributions"
+        },
+        {
+          "amount": 0.499,
+          "currency": "USD",
+          "exDate": "2025-11-14",
+          "payDate": null,
+          "recordDate": null,
+          "declarationDate": null,
+          "source": "Yahoo Finance historical distributions"
+        },
+        {
+          "amount": 0.499,
+          "currency": "USD",
+          "exDate": "2025-08-15",
+          "payDate": null,
+          "recordDate": null,
+          "declarationDate": null,
+          "source": "Yahoo Finance historical distributions"
+        },
+        {
+          "amount": 0.48,
+          "currency": "USD",
+          "exDate": "2025-05-16",
+          "payDate": null,
+          "recordDate": null,
+          "declarationDate": null,
+          "source": "Yahoo Finance historical distributions"
+        }
+      ],
+      "trailing12m": 2.017,
+      "trailingYieldPct": 4.5027,
+      "annualizedDividend": null,
+      "historyPrice": 44.795,
+      "historyError": null
+    },
+    {
+      "symbol": "TTE",
+      "name": "TotalEnergies",
+      "qualityNote": "Integrated energy income. Watch oil, LNG, cash flow and the balance between dividends and buybacks.",
+      "source": "Nasdaq Dividend Calendar + Yahoo Finance history",
+      "dataAvailable": true,
+      "status": "Awaiting next declaration",
+      "next": null,
+      "upcoming": [],
+      "pendingPayments": [],
+      "recent": [
+        {
+          "amount": 0.974,
+          "currency": "USD",
+          "exDate": "2026-03-31",
+          "payDate": null,
+          "recordDate": null,
+          "declarationDate": null,
+          "source": "Yahoo Finance historical distributions"
+        },
+        {
+          "amount": 0.995,
+          "currency": "USD",
+          "exDate": "2025-12-31",
+          "payDate": null,
+          "recordDate": null,
+          "declarationDate": null,
+          "source": "Yahoo Finance historical distributions"
+        },
+        {
+          "amount": 0.994,
+          "currency": "USD",
+          "exDate": "2025-09-30",
+          "payDate": null,
+          "recordDate": null,
+          "declarationDate": null,
+          "source": "Yahoo Finance historical distributions"
+        },
+        {
+          "amount": 0.999,
+          "currency": "USD",
+          "exDate": "2025-06-18",
+          "payDate": null,
+          "recordDate": null,
+          "declarationDate": null,
+          "source": "Yahoo Finance historical distributions"
+        },
+        {
+          "amount": 0.831,
+          "currency": "USD",
+          "exDate": "2025-03-25",
+          "payDate": null,
+          "recordDate": null,
+          "declarationDate": null,
+          "source": "Yahoo Finance historical distributions"
+        },
+        {
+          "amount": 0.831,
+          "currency": "USD",
+          "exDate": "2024-12-31",
+          "payDate": null,
+          "recordDate": null,
+          "declarationDate": null,
+          "source": "Yahoo Finance historical distributions"
+        }
+      ],
+      "trailing12m": 2.963,
+      "trailingYieldPct": 3.2842,
+      "annualizedDividend": null,
+      "historyPrice": 90.22,
+      "historyError": null
+    },
+    {
+      "symbol": "VOO",
+      "name": "VOO",
+      "qualityNote": "Broad-market ETF distributions. Income is diversified across the S&P 500 and can vary quarter to quarter.",
+      "source": "Nasdaq Dividend Calendar + Yahoo Finance history",
+      "dataAvailable": true,
+      "status": "Awaiting next declaration",
+      "next": null,
+      "upcoming": [],
+      "pendingPayments": [],
+      "recent": [
+        {
+          "amount": 1.962,
+          "currency": "USD",
+          "exDate": "2026-06-26",
+          "payDate": null,
+          "recordDate": null,
+          "declarationDate": null,
+          "source": "Yahoo Finance historical distributions"
+        },
+        {
+          "amount": 1.872,
+          "currency": "USD",
+          "exDate": "2026-03-27",
+          "payDate": null,
+          "recordDate": null,
+          "declarationDate": null,
+          "source": "Yahoo Finance historical distributions"
+        },
+        {
+          "amount": 1.771,
+          "currency": "USD",
+          "exDate": "2025-12-22",
+          "payDate": null,
+          "recordDate": null,
+          "declarationDate": null,
+          "source": "Yahoo Finance historical distributions"
+        },
+        {
+          "amount": 1.74,
+          "currency": "USD",
+          "exDate": "2025-09-29",
+          "payDate": null,
+          "recordDate": null,
+          "declarationDate": null,
+          "source": "Yahoo Finance historical distributions"
+        },
+        {
+          "amount": 1.745,
+          "currency": "USD",
+          "exDate": "2025-06-30",
+          "payDate": null,
+          "recordDate": null,
+          "declarationDate": null,
+          "source": "Yahoo Finance historical distributions"
+        },
+        {
+          "amount": 1.812,
+          "currency": "USD",
+          "exDate": "2025-03-27",
+          "payDate": null,
+          "recordDate": null,
+          "declarationDate": null,
+          "source": "Yahoo Finance historical distributions"
+        }
+      ],
+      "trailing12m": 7.345,
+      "trailingYieldPct": 1.0412,
+      "annualizedDividend": null,
+      "historyPrice": 705.44,
+      "historyError": null
+    }
+  ]
+}
