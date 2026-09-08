@@ -1,0 +1,20 @@
+{
+  "generatedAt": "2026-09-08T19:12:52.372638+00:00",
+  "status": "error",
+  "error": "HTTP Error 404: Not Found",
+  "method": "Doc's Formula for Buying Winning Stocks",
+  "universe": "U.S.-listed stocks with 10+ consecutive years of dividend growth",
+  "universeCount": 0,
+  "screenedCount": 0,
+  "quickPassCount": 0,
+  "winnerCount": 0,
+  "criteria": {
+    "minConsecutiveRevenueYears": 3,
+    "minRoaPct": 10.0,
+    "minDividendGrowthYears": 10,
+    "maxNetDebtToEbitda": 4.0,
+    "maxPe": 25.0
+  },
+  "winners": [],
+  "nearMisses": []
+}
