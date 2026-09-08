@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 import concurrent.futures
 import datetime as dt
+import html
 import json
 import re
 import statistics
 import urllib.parse
 import urllib.request
+from html.parser import HTMLParser
 from pathlib import Path
 
 CONFIG_PATH = Path("config.json")
@@ -21,10 +23,19 @@ BROWSER_HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
                   "(KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
     "Accept": "application/json, text/plain, */*",
-    "Accept-Language": "en-US,en;q=0.9",
-    "Origin": "https://www.nasdaq.com",
-    "Referer": "https://www.nasdaq.com/market-activity/dividends"
+    "Accept-Language": "en-US,en;q=0.9"
 }
+
+
+class TextExtractor(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.parts = []
+
+    def handle_data(self, data):
+        value = html.unescape(data).strip()
+        if value:
+            self.parts.append(value)
 
 
 def get_json(url, headers=None, timeout=18):
@@ -36,15 +47,24 @@ def get_json(url, headers=None, timeout=18):
         return json.load(response)
 
 
+def get_text(url, headers=None, timeout=18):
+    req_headers = {"User-Agent": BROWSER_HEADERS["User-Agent"]}
+    if headers:
+        req_headers.update(headers)
+    req = urllib.request.Request(url, headers=req_headers)
+    with urllib.request.urlopen(req, timeout=timeout) as response:
+        return response.read().decode("utf-8", errors="replace")
+
+
 def parse_date(value):
     if not value:
         return None
-    text = str(value).strip()
-    if not text or text.upper() in {"N/A", "NA", "NONE", "--"}:
+    text_value = str(value).strip()
+    if not text_value or text_value.upper() in {"N/A", "NA", "NONE", "--", "—"}:
         return None
-    for fmt in ("%Y-%m-%d", "%m/%d/%Y", "%m/%d/%y"):
+    for fmt in ("%Y-%m-%d", "%m/%d/%Y", "%m/%d/%y", "%b %d, %Y", "%B %d, %Y"):
         try:
-            return dt.datetime.strptime(text[:10], fmt).date()
+            return dt.datetime.strptime(text_value, fmt).date()
         except ValueError:
             pass
     return None
@@ -60,11 +80,11 @@ def parse_number(value):
         return None
     if isinstance(value, (int, float)):
         return float(value)
-    text = re.sub(r"[^0-9.\-]", "", str(value))
-    if not text or text in {"-", ".", "-."}:
+    text_value = re.sub(r"[^0-9.\-]", "", str(value))
+    if not text_value or text_value in {"-", ".", "-."}:
         return None
     try:
-        return float(text)
+        return float(text_value)
     except ValueError:
         return None
 
@@ -75,11 +95,7 @@ def fetch_yahoo_history(symbol):
         f"https://query1.finance.yahoo.com/v8/finance/chart/{encoded}"
         "?range=2y&interval=1d&events=div%2Csplits"
     )
-    headers = {
-        "User-Agent": BROWSER_HEADERS["User-Agent"],
-        "Accept": "application/json, text/plain, */*"
-    }
-    payload = get_json(url, headers=headers, timeout=18)
+    payload = get_json(url, headers=BROWSER_HEADERS, timeout=18)
     result = ((((payload or {}).get("chart") or {}).get("result") or [None])[0]) or {}
     meta = result.get("meta") or {}
     price = parse_number(meta.get("regularMarketPrice"))
@@ -109,6 +125,47 @@ def fetch_yahoo_history(symbol):
     return history, price
 
 
+def fetch_stockanalysis_events(symbol, asset_class):
+    group = "etf" if asset_class == "etf" else "stocks"
+    url = f"https://stockanalysis.com/{group}/{symbol.lower()}/dividend/"
+    source_html = get_text(url, headers={
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Referer": "https://stockanalysis.com/"
+    }, timeout=18)
+    parser = TextExtractor()
+    parser.feed(source_html)
+    page_text = " ".join(parser.parts)
+
+    month = r"(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)"
+    date_pattern = rf"{month}\s+\d{{1,2}},\s+\d{{4}}"
+    row_pattern = re.compile(
+        rf"({date_pattern})\s+\$([0-9.,]+)\s+({date_pattern}|N/A|--|—|-)\s+({date_pattern})"
+    )
+
+    events = []
+    for match in row_pattern.finditer(page_text):
+        ex_date, amount, record_date, pay_date = match.groups()
+        ex_iso = iso_date(ex_date)
+        pay_iso = iso_date(pay_date)
+        if not ex_iso or not pay_iso:
+            continue
+        events.append({
+            "symbol": symbol,
+            "name": tracked[symbol].get("name", symbol),
+            "amount": parse_number(amount),
+            "currency": "USD",
+            "declarationDate": None,
+            "exDate": ex_iso,
+            "recordDate": iso_date(record_date),
+            "payDate": pay_iso,
+            "annualizedDividend": None,
+            "source": "StockAnalysis dividend history"
+        })
+
+    unique = {event["exDate"]: event for event in events}
+    return sorted(unique.values(), key=lambda event: event.get("exDate") or "9999-12-31")
+
+
 def predicted_calendar_dates(history):
     dates = [parse_date(event.get("exDate")) for event in history[:6]]
     dates = [date for date in dates if date]
@@ -131,8 +188,13 @@ def predicted_calendar_dates(history):
 
 def fetch_calendar_day(day):
     url = "https://api.nasdaq.com/api/calendar/dividends?" + urllib.parse.urlencode({"date": day.isoformat()})
+    headers = {
+        **BROWSER_HEADERS,
+        "Origin": "https://www.nasdaq.com",
+        "Referer": "https://www.nasdaq.com/market-activity/dividends"
+    }
     try:
-        payload = get_json(url, headers=BROWSER_HEADERS, timeout=18)
+        payload = get_json(url, headers=headers, timeout=18)
         calendar = (((payload or {}).get("data") or {}).get("calendar") or {})
         rows = calendar.get("rows") or []
         matches = []
@@ -163,7 +225,10 @@ def fetch_calendar_day(day):
 history_by_symbol = {}
 price_by_symbol = {}
 history_errors = {}
-for symbol in tracked:
+forward_by_symbol = {symbol: [] for symbol in tracked}
+forward_errors = {}
+
+for symbol, cfg in tracked.items():
     try:
         history, price = fetch_yahoo_history(symbol)
         history_by_symbol[symbol] = history
@@ -174,11 +239,20 @@ for symbol in tracked:
         history_errors[symbol] = str(exc)
         print(f"Yahoo dividend history {symbol}: {exc}")
 
+    try:
+        forward_by_symbol[symbol] = fetch_stockanalysis_events(symbol, cfg.get("assetClass", "stocks"))
+    except Exception as exc:
+        forward_errors[symbol] = str(exc)
+        print(f"StockAnalysis dividends {symbol}: {exc}")
+
+# Use Nasdaq's calendar as a fallback around the historically likely next ex-date
+# for names whose forward page has no future ex-dividend event yet.
 calendar_dates = set()
-for history in history_by_symbol.values():
-    calendar_dates.update(predicted_calendar_dates(history))
-# Always check today and a few nearby dates for newly announced near-term events.
-for offset in range(0, 8):
+for symbol, history in history_by_symbol.items():
+    has_future = any(parse_date(event.get("exDate")) and parse_date(event.get("exDate")) >= today for event in forward_by_symbol.get(symbol, []))
+    if not has_future:
+        calendar_dates.update(predicted_calendar_dates(history))
+for offset in range(0, 5):
     calendar_dates.add(today + dt.timedelta(days=offset))
 calendar_dates = sorted(calendar_dates)
 
@@ -190,16 +264,25 @@ with concurrent.futures.ThreadPoolExecutor(max_workers=6) as pool:
 calendar_by_symbol = {symbol: [] for symbol in tracked}
 for event in calendar_events:
     calendar_by_symbol[event["symbol"]].append(event)
-for events in calendar_by_symbol.values():
-    unique = {event.get("exDate"): event for event in events if event.get("exDate")}
-    events[:] = sorted(unique.values(), key=lambda event: event.get("exDate") or "9999-12-31")
 
 records = []
 trailing_start = today - dt.timedelta(days=365)
 for symbol, cfg in tracked.items():
     history = history_by_symbol.get(symbol, [])
     price = price_by_symbol.get(symbol)
-    confirmed_events = calendar_by_symbol.get(symbol, [])
+    merged = {}
+    for event in forward_by_symbol.get(symbol, []):
+        merged[event.get("exDate")] = event
+    for event in calendar_by_symbol.get(symbol, []):
+        ex_date = event.get("exDate")
+        if ex_date in merged:
+            merged[ex_date] = {**merged[ex_date], **{k: v for k, v in event.items() if v is not None}}
+        else:
+            merged[ex_date] = event
+    confirmed_events = sorted(
+        [event for key, event in merged.items() if key],
+        key=lambda event: event.get("exDate") or "9999-12-31"
+    )
 
     future_ex = [
         event for event in confirmed_events
@@ -233,16 +316,11 @@ for symbol, cfg in tracked.items():
         trailing_yield = trailing_total / price * 100
 
     recent = history[:6]
-    for idx, event in enumerate(recent):
-        match = next((c for c in confirmed_events if c.get("exDate") == event.get("exDate")), None)
-        if match:
-            recent[idx] = {**event, **{k: v for k, v in match.items() if v is not None}}
-
     records.append({
         "symbol": symbol,
         "name": cfg.get("name", symbol),
         "qualityNote": cfg.get("qualityNote", ""),
-        "source": "Nasdaq Dividend Calendar + Yahoo Finance history",
+        "source": "StockAnalysis forward events + Nasdaq calendar fallback + Yahoo Finance history",
         "dataAvailable": bool(history or confirmed_events),
         "status": status,
         "next": next_event,
@@ -253,7 +331,8 @@ for symbol, cfg in tracked.items():
         "trailingYieldPct": round(trailing_yield, 4) if trailing_yield is not None else None,
         "annualizedDividend": (next_event or {}).get("annualizedDividend") if next_event else None,
         "historyPrice": price,
-        "historyError": history_errors.get(symbol)
+        "historyError": history_errors.get(symbol),
+        "forwardError": forward_errors.get(symbol)
     })
 
 output = {
@@ -262,4 +341,4 @@ output = {
     "records": records
 }
 OUTPUT_PATH.write_text(json.dumps(output, indent=2))
-print(f"Wrote {OUTPUT_PATH}: {len(records)} tracked names, {len(calendar_dates)} calendar dates checked, {len(calendar_events)} matched events")
+print(f"Wrote {OUTPUT_PATH}: {len(records)} tracked names, {len(calendar_dates)} Nasdaq fallback dates checked")
