@@ -1,0 +1,48 @@
+name: Refresh Dividend Desk
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "30 12 * * *"
+  push:
+    branches: ["main"]
+    paths:
+      - "config.json"
+      - "scripts/fetch_dividends.py"
+      - ".github/workflows/dividends.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: market-espresso-dividends
+  cancel-in-progress: true
+
+jobs:
+  refresh-dividends:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Refresh confirmed dividends and history
+        run: python scripts/fetch_dividends.py
+
+      - name: Save daily dividend snapshot
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/dividends.json
+          if git diff --cached --quiet; then
+            echo "Dividend snapshot is unchanged."
+          else
+            git commit -m "Refresh dividend desk data"
+            git push
+          fi
