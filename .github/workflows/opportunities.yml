@@ -8,7 +8,7 @@ on:
     branches: ["main"]
     paths:
       - "config.json"
-      - "scripts/fetch_opportunities.py"
+      - "scripts/fetch_opportunities_v2.py"
       - ".github/workflows/opportunities.yml"
 
 permissions:
@@ -38,14 +38,15 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install screener parser
-        run: python -m pip install beautifulsoup4
+      - name: Install screener dependencies
+        run: python -m pip install requests beautifulsoup4
 
       - name: Run Doc formula dividend screen
         continue-on-error: true
         env:
-          OPPORTUNITY_WORKERS: "8"
-        run: python scripts/fetch_opportunities.py
+          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+          OPPORTUNITY_REQUEST_DELAY: "1.05"
+        run: python scripts/fetch_opportunities_v2.py
 
       - name: Ensure opportunity snapshot exists
         run: |
@@ -57,12 +58,11 @@ jobs:
           Path("data/opportunities.json").write_text(json.dumps({
               "generatedAt": dt.datetime.now(dt.timezone.utc).isoformat(),
               "status": "error",
-              "error": "The automated data source did not return a usable screen on this run.",
+              "error": "The automated data sources did not return a usable screen on this run.",
               "method": "Doc's Formula for Buying Winning Stocks",
-              "universe": "U.S.-listed stocks with 10+ consecutive years of dividend growth",
+              "universe": "S&P U.S. Dividend Growers / VIG holdings (10+ consecutive years of dividend growth)",
               "universeCount": 0,
               "screenedCount": 0,
-              "quickPassCount": 0,
               "winnerCount": 0,
               "criteria": {"minConsecutiveRevenueYears":3,"minRoaPct":10,"minDividendGrowthYears":10,"maxNetDebtToEbitda":4,"maxPe":25},
               "winners": [],
