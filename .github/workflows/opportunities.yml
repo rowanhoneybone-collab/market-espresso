@@ -58,7 +58,7 @@ jobs:
               "status": "error",
               "error": "The automated data sources did not return a usable screen on this run.",
               "method": "Doc's Formula for Buying Winning Stocks",
-              "universe": "Nasdaq US Broad Dividend Achievers (10+ consecutive years of dividend growth)",
+              "universe": "U.S. Dividend Achievers (10+ consecutive years of dividend growth)",
               "universeCount": 0,
               "screenedCount": 0,
               "winnerCount": 0,
@@ -68,6 +68,22 @@ jobs:
           }, indent=2))
           PY
           fi
+
+      - name: Label universe by actual source
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          path = Path("data/opportunities.json")
+          data = json.loads(path.read_text())
+          if data.get("status") == "ok":
+              source = str(data.get("universeSource") or "")
+              if "Nasdaq" in source:
+                  data["universe"] = "Nasdaq US Broad Dividend Achievers (10+ consecutive years of dividend growth)"
+              else:
+                  data["universe"] = "U.S. Dividend Achievers (10+ consecutive years of dividend growth)"
+              path.write_text(json.dumps(data, indent=2))
+          PY
 
       - name: Validate opportunity screen
         run: |
