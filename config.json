@@ -66,21 +66,25 @@
     {
       "symbol": "ITW",
       "name": "Illinois Tool Works",
+      "assetClass": "stocks",
       "qualityNote": "Dividend-growth industrial. Focus on free cash flow, payout sustainability and continued dividend growth."
     },
     {
       "symbol": "BP",
       "name": "BP",
+      "assetClass": "stocks",
       "qualityNote": "Energy income holding. The dividend can be attractive, but oil prices, debt and capital discipline matter."
     },
     {
       "symbol": "TTE",
       "name": "TotalEnergies",
+      "assetClass": "stocks",
       "qualityNote": "Integrated energy income. Watch oil, LNG, cash flow and the balance between dividends and buybacks."
     },
     {
       "symbol": "VOO",
       "name": "VOO",
+      "assetClass": "etf",
       "qualityNote": "Broad-market ETF distributions. Income is diversified across the S&P 500 and can vary quarter to quarter."
     }
   ],
