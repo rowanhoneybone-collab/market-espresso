@@ -23,6 +23,7 @@ concurrency:
 jobs:
   refresh-opportunities:
     runs-on: ubuntu-latest
+    timeout-minutes: 8
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -39,13 +40,10 @@ jobs:
           python-version: "3.12"
 
       - name: Install screener dependencies
-        run: python -m pip install requests beautifulsoup4
+        run: python -m pip install requests beautifulsoup4 pypdf
 
       - name: Run Doc formula dividend screen
         continue-on-error: true
-        env:
-          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
-          OPPORTUNITY_REQUEST_DELAY: "1.05"
         run: python scripts/fetch_opportunities_v2.py
 
       - name: Ensure opportunity snapshot exists
@@ -60,7 +58,7 @@ jobs:
               "status": "error",
               "error": "The automated data sources did not return a usable screen on this run.",
               "method": "Doc's Formula for Buying Winning Stocks",
-              "universe": "S&P U.S. Dividend Growers / VIG holdings (10+ consecutive years of dividend growth)",
+              "universe": "Nasdaq US Broad Dividend Achievers (10+ consecutive years of dividend growth)",
               "universeCount": 0,
               "screenedCount": 0,
               "winnerCount": 0,
