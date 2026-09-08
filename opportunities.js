@@ -14,6 +14,16 @@
     return `<article class="formulaCard"><label>${esc(label)}</label><strong>${esc(value)}</strong><p>${esc(note)}</p></article>`;
   }
 
+  function renderCriteria(c={}){
+    $("formulaCriteria").innerHTML = [
+      criterion("TOP-LINE GROWTH", `${c.minConsecutiveRevenueYears ?? 3}+ years`, "Consecutive completed fiscal years with higher revenue."),
+      criterion("RETURN ON ASSETS", `≥ ${c.minRoaPct ?? 10}%`, "How efficiently the business turns its assets into profit."),
+      criterion("DIVIDEND GROWTH", `${c.minDividendGrowthYears ?? 10}+ years`, "Consecutive years of dividend increases."),
+      criterion("NET DEBT / EBITDA", `< ${c.maxNetDebtToEbitda ?? 4}`, "Lower leverage gives the company more financial breathing room."),
+      criterion("P/E RATIO", `< ${c.maxPe ?? 25}`, "Avoid paying an extreme price even for a high-quality business."),
+    ].join("");
+  }
+
   function passDot(ok, text){
     return `<span class="ruleDot ${ok ? "pass" : "fail"}">${ok ? "✓" : "×"} ${esc(text)}</span>`;
   }
@@ -34,15 +44,24 @@
     </tr>`;
   }
 
+  function renderUnavailable(data={}){
+    renderCriteria(data.criteria || {});
+    $("opportunityMeta").innerHTML = `
+      <article><label>SCREEN STATUS</label><strong>Unavailable</strong><span>The latest automated screen could not be completed.</span></article>
+      <article><label>FORMULA</label><strong>5 rules saved</strong><span>The thresholds remain active and unchanged.</span></article>
+      <article><label>LAST ATTEMPT</label><strong class="metaDate">${dateTime(data.generatedAt)}</strong><span>Market Espresso will retry on the next scheduled run.</span></article>`;
+    $("opportunityWinners").innerHTML = `<div class="emptyState"><b>Do not interpret this as “zero qualifying stocks.”</b><p>The outside screening source did not return a usable dataset on this run, so Market Espresso is withholding results rather than showing a false zero.</p></div>`;
+    $("opportunityNearMisses").innerHTML = "";
+    $("opportunitySource").textContent = data.error ? `Latest data-source message: ${data.error}` : "The latest opportunity screen was unavailable.";
+  }
+
   function render(data){
+    if(data?.status && data.status !== "ok"){
+      renderUnavailable(data);
+      return;
+    }
     const c = data.criteria || {};
-    $("formulaCriteria").innerHTML = [
-      criterion("TOP-LINE GROWTH", `${c.minConsecutiveRevenueYears ?? 3}+ years`, "Consecutive completed fiscal years with higher revenue."),
-      criterion("RETURN ON ASSETS", `≥ ${c.minRoaPct ?? 10}%`, "How efficiently the business turns its assets into profit."),
-      criterion("DIVIDEND GROWTH", `${c.minDividendGrowthYears ?? 10}+ years`, "Consecutive years of dividend increases."),
-      criterion("NET DEBT / EBITDA", `< ${c.maxNetDebtToEbitda ?? 4}`, "Lower leverage gives the company more financial breathing room."),
-      criterion("P/E RATIO", `< ${c.maxPe ?? 25}`, "Avoid paying an extreme price even for a high-quality business."),
-    ].join("");
+    renderCriteria(c);
 
     $("opportunityMeta").innerHTML = `
       <article><label>UNIVERSE</label><strong>${data.universeCount ?? "—"}</strong><span>10+ year U.S. dividend growers</span></article>
@@ -70,17 +89,7 @@
       if(!r.ok) throw new Error(`opportunities.json returned ${r.status}`);
       render(await r.json());
     }catch(err){
-      $("formulaCriteria").innerHTML = [
-        criterion("TOP-LINE GROWTH","3+ years","Consecutive completed fiscal years with higher revenue."),
-        criterion("RETURN ON ASSETS","≥ 10%","Doc's profitability threshold."),
-        criterion("DIVIDEND GROWTH","10+ years","Consecutive annual dividend increases."),
-        criterion("NET DEBT / EBITDA","< 4","Doc's leverage ceiling."),
-        criterion("P/E RATIO","< 25","Doc's valuation ceiling."),
-      ].join("");
-      $("opportunityMeta").innerHTML = `<article><label>SCREEN STATUS</label><strong>Building</strong><span>The first full market screen has not published yet.</span></article>`;
-      $("opportunityWinners").innerHTML = `<div class="emptyState"><b>Formula is configured; opportunity data is not published yet.</b><p>The screen will populate from the next successful opportunity refresh.</p></div>`;
-      $("opportunityNearMisses").innerHTML = "";
-      $("opportunitySource").textContent = "Doc's five rules are saved in Market Espresso and will remain visible even if the data source is temporarily unavailable.";
+      renderUnavailable({error:"The first full opportunity dataset has not published yet."});
     }
   }
 
