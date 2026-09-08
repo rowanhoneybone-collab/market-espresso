@@ -23,6 +23,7 @@
   <nav>
     <button class="active" data-tab="front">Front Page</button>
     <button data-tab="money">My Money</button>
+    <button data-tab="dividends">Dividends</button>
     <button data-tab="rates">Fed & Bonds</button>
     <button data-tab="energy">Energy</button>
     <button data-tab="ai">AI + Health</button>
@@ -56,6 +57,21 @@
 <section id="money" class="tab">
   <div class="sectionHead"><div><label>MY MONEY</label><h2>Your holdings.</h2></div><p>Price moves come from the latest published market data. The thesis notes stay focused on the long term.</p></div>
   <div class="cards" id="portfolioCards"></div>
+</section>
+
+<section id="dividends" class="tab">
+  <div class="sectionHead"><div><label>DIVIDEND DESK</label><h2>Confirmed income, not guesswork.</h2></div><p>Track declared payouts, ex-dividend dates, payment dates and the income names already on your radar.</p></div>
+  <div class="divSummary" id="dividendSummary"></div>
+
+  <div class="newsBlock dividendBlock">
+    <div class="miniHead"><div><label>UPCOMING DIVIDEND CALENDAR</label><h3>Declared & upcoming.</h3></div><p>The ex-dividend date is the key cutoff: generally, you must own shares before that date to receive the declared payout.</p></div>
+    <div id="dividendCalendar"></div>
+  </div>
+
+  <div class="newsBlock dividendBlock">
+    <div class="miniHead"><div><label>DIVIDEND WATCHLIST</label><h3>Income names worth monitoring.</h3></div><p>Trailing yield is based on cash dividends from the last 12 months divided by the latest published share price. It is not a promise of future yield.</p></div>
+    <div class="divCards" id="dividendWatchlistCards"></div>
+  </div>
 </section>
 
 <section id="rates" class="tab">
