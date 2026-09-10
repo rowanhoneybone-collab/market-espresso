@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="./styles.css"/>
 <link rel="stylesheet" href="./dividends.css"/>
 <link rel="stylesheet" href="./opportunities.css"/>
+<link rel="stylesheet" href="./sector-coverage.css"/>
 </head>
 <body>
 <div class="paper">
@@ -140,7 +141,14 @@
     <article><b>02</b><h3>Midstream</h3><p>Pipelines, storage and transport.</p><strong>Volume and contracts often matter more than price.</strong></article>
     <article><b>03</b><h3>Downstream</h3><p>Refining and selling fuels.</p><strong>Profit margins matter more than crude price alone.</strong></article>
   </div>
-  <div class="newsBlock"><label>LIVE ENERGY HEADLINES</label><div id="energyNews"></div></div>
+  <div class="sectorRadar">
+    <div class="sectorRadarHead">
+      <div><label>SECTOR RADAR</label><h3>Know the companies shaping energy.</h3><p>Live price moves plus a plain-English business lens across integrated majors, upstream, midstream/LNG, downstream and oilfield services—not just the names you own.</p></div>
+      <span class="sectorCount" id="energyCompanyCount">Loading companies…</span>
+    </div>
+    <div class="sectorCards" id="energyCompanyCards"></div>
+  </div>
+  <div class="newsBlock"><label>LIVE ENERGY HEADLINES • BROADER SECTOR</label><div id="energyNews"></div></div>
 </section>
 
 <section id="ai" class="tab">
@@ -149,12 +157,20 @@
     <article><h3>Tempus AI</h3><p><b>Simple thesis:</b> Tempus becomes more valuable if it can turn medical data and AI into products that doctors and drug companies repeatedly pay for.</p></article>
     <article><h3>AIQ</h3><p><b>Simple thesis:</b> AIQ spreads your AI exposure across many companies, lowering single-stock risk while still leaving you exposed to growth-stock valuations and interest rates.</p></article>
   </div>
-  <div class="newsBlock"><label>LIVE AI + HEALTHCARE HEADLINES</label><div id="aiHealthNews"></div></div>
+  <div class="sectorRadar">
+    <div class="sectorRadarHead">
+      <div><label>SECTOR RADAR</label><h3>Know the companies shaping AI + healthcare.</h3><p>Live price moves and simple business context across AI infrastructure, platforms, software, pharma, managed care, medtech and life-science tools—not just TEM and AIQ.</p></div>
+      <span class="sectorCount" id="aiHealthCompanyCount">Loading companies…</span>
+    </div>
+    <div class="sectorCards" id="aiHealthCompanyCards"></div>
+  </div>
+  <div class="newsBlock"><label>LIVE AI + HEALTHCARE HEADLINES • BROADER SECTOR</label><div id="aiHealthNews"></div></div>
 </section>
 </main>
 <footer>Market Espresso • Learning and research only, not investment advice.</footer>
 </div>
 <script src="./app.js"></script>
 <script src="./opportunities.js"></script>
+<script src="./sector-coverage.js"></script>
 </body>
 </html>
