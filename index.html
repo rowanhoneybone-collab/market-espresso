@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="./dividends.css"/>
 <link rel="stylesheet" href="./opportunities.css"/>
 <link rel="stylesheet" href="./sector-coverage.css"/>
+<link rel="stylesheet" href="./rates.css"/>
 </head>
 <body>
 <div class="paper">
@@ -126,12 +127,40 @@
 </section>
 
 <section id="rates" class="tab">
-  <div class="sectionHead"><div><label>FED & BONDS</label><h2>Interest rates, translated.</h2></div></div>
-  <div class="explainer">
-    <h3>Think of rates as the price of money.</h3>
-    <p>When rates are high, mortgages, car loans and business borrowing cost more. That can slow the economy. High bond yields also give investors a safer place to earn returns, so stocks—especially high-growth stocks—have to work harder to look attractive.</p>
-    <div class="flow"><span>Rates ↑</span><b>→</b><span>Borrowing costs ↑</span><b>→</b><span>Growth can slow</span><b>→</b><span>Expensive stocks feel pressure</span></div>
+  <div class="sectionHead"><div><label>FED & BONDS</label><h2>Rates desk.</h2></div><p>Current policy, the Treasury curve, daily yield moves and the headlines driving expectations—then the logic underneath it.</p></div>
+
+  <div class="rateSummary" id="rateSummary">
+    <article class="rateCard"><label>LOADING</label><strong>—</strong><span>Reading the latest Fed and Treasury data.</span></article>
   </div>
+
+  <div class="rateLayout">
+    <div class="ratePanel">
+      <label>U.S. TREASURY YIELD CURVE</label>
+      <h3>Rates across the curve.</h3>
+      <p>The 2-year is especially sensitive to expected Fed policy. The 10-year matters broadly for mortgages, corporate borrowing and stock valuations.</p>
+      <div class="curveGrid" id="yieldCurve"></div>
+    </div>
+    <div class="ratePanel">
+      <label>MARKET ESPRESSO READ</label>
+      <h3>What the numbers mean.</h3>
+      <div class="rateRead" id="rateRead"></div>
+    </div>
+  </div>
+
+  <div class="newsBlock">
+    <div class="miniHead"><div><label>FED & RATES HEADLINES</label><h3>What could move rate expectations.</h3></div><p>Official Federal Reserve releases are combined with relevant inflation, Treasury, bond and rate headlines from the broader market feed.</p></div>
+    <div class="ratesNewsGrid" id="ratesHeadlines"></div>
+  </div>
+
+  <div class="newsBlock">
+    <label>THE LOGIC</label>
+    <div class="explainer">
+      <h3>Think of rates as the price of money.</h3>
+      <p>When rates are high, mortgages, car loans and business borrowing cost more. That can slow the economy. High bond yields also give investors a safer place to earn returns, so stocks—especially high-growth stocks—have to work harder to look attractive.</p>
+      <div class="flow"><span>Rates ↑</span><b>→</b><span>Borrowing costs ↑</span><b>→</b><span>Growth can slow</span><b>→</b><span>Expensive stocks feel pressure</span></div>
+    </div>
+  </div>
+  <p class="ratesSource" id="ratesSource"></p>
 </section>
 
 <section id="energy" class="tab">
@@ -172,5 +201,6 @@
 <script src="./app.js"></script>
 <script src="./opportunities.js"></script>
 <script src="./sector-coverage.js"></script>
+<script src="./rates.js"></script>
 </body>
 </html>
