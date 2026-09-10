@@ -40,5 +40,43 @@
   "sections": {
     "energyThemes": ["energy"],
     "aiHealthThemes": ["ai", "healthcare"]
+  },
+  "sectorCoverage": {
+    "energy": [
+      {"symbol":"BP","name":"BP","group":"Integrated","role":"Global integrated energy major with upstream, refining, trading and low-carbon exposure.","watch":"Oil and LNG prices, debt, refining margins, project execution and shareholder returns.","news":true},
+      {"symbol":"TTE","name":"TotalEnergies","group":"Integrated","role":"Global integrated energy company with oil, LNG, refining, power and renewables.","watch":"Oil and LNG cash flow, capital spending, buybacks and dividend growth.","news":true},
+      {"symbol":"XOM","name":"Exxon Mobil","group":"Integrated","role":"Large integrated major with upstream, refining, chemicals and LNG exposure.","watch":"Permian production, Guyana growth, refining margins and capital returns.","news":true},
+      {"symbol":"CVX","name":"Chevron","group":"Integrated","role":"Large integrated producer with major U.S. and international upstream assets.","watch":"Production growth, project execution, oil prices and shareholder returns.","news":false},
+      {"symbol":"COP","name":"ConocoPhillips","group":"Upstream","role":"Large exploration and production company focused mainly on producing oil and gas.","watch":"Oil prices, production growth, acquisition integration and capital discipline.","news":false},
+      {"symbol":"OXY","name":"Occidental Petroleum","group":"Upstream","role":"Producer with major Permian exposure plus chemicals and carbon-management projects.","watch":"Debt reduction, Permian performance, oil prices and low-carbon investments.","news":true},
+      {"symbol":"EOG","name":"EOG Resources","group":"Upstream","role":"U.S.-focused producer known for disciplined shale development and strong acreage.","watch":"Well productivity, oil prices, drilling returns and free cash flow.","news":false},
+      {"symbol":"FANG","name":"Diamondback Energy","group":"Upstream","role":"Permian-focused producer with concentrated exposure to U.S. shale economics.","watch":"Permian costs, production efficiency, integration and shareholder returns.","news":false},
+      {"symbol":"WMB","name":"Williams Companies","group":"Midstream / LNG","role":"Natural-gas infrastructure company centered on pipelines and contracted transportation.","watch":"Gas volumes, project approvals, contract growth and dividend coverage.","news":true},
+      {"symbol":"EPD","name":"Enterprise Products Partners","group":"Midstream / LNG","role":"Diversified midstream operator spanning pipelines, storage, fractionation and exports.","watch":"Volumes, new projects, distribution coverage and export demand.","news":false},
+      {"symbol":"ET","name":"Energy Transfer","group":"Midstream / LNG","role":"Large pipeline and terminal network moving crude oil, natural gas and NGLs.","watch":"Volumes, leverage, project execution and distribution growth.","news":false},
+      {"symbol":"LNG","name":"Cheniere Energy","group":"Midstream / LNG","role":"Major U.S. LNG exporter connecting domestic natural gas to global buyers.","watch":"LNG contract volumes, expansion projects, gas spreads and capital returns.","news":true},
+      {"symbol":"MPC","name":"Marathon Petroleum","group":"Downstream","role":"Large U.S. refiner and fuel marketer with exposure to refining economics.","watch":"Crack spreads, refinery utilization, fuel demand and buybacks.","news":false},
+      {"symbol":"VLO","name":"Valero Energy","group":"Downstream","role":"Independent refiner with large gasoline, diesel and renewable-fuels operations.","watch":"Refining margins, utilization, fuel demand and renewable diesel economics.","news":false},
+      {"symbol":"SLB","name":"SLB","group":"Oilfield Services","role":"Global oilfield-services leader supplying technology and services to producers.","watch":"International drilling activity, offshore spending, pricing and margins.","news":true},
+      {"symbol":"HAL","name":"Halliburton","group":"Oilfield Services","role":"Oilfield-services company with strong North American completions and international operations.","watch":"U.S. shale activity, international growth, service pricing and margins.","news":false}
+    ],
+    "aiHealth": [
+      {"symbol":"TEM","name":"Tempus AI","group":"Healthcare AI","role":"Uses clinical and molecular data to build AI-enabled tools for precision medicine.","watch":"Revenue growth, data monetization, customer adoption and the path to profitability.","news":true},
+      {"symbol":"AIQ","name":"Global X Artificial Intelligence & Technology ETF","group":"AI Basket","role":"ETF providing diversified exposure across artificial-intelligence and technology companies.","watch":"AI capital spending, mega-cap valuations, rates and concentration in top holdings.","news":false},
+      {"symbol":"NVDA","name":"NVIDIA","group":"AI Infrastructure","role":"Leading supplier of accelerated-computing chips and systems used to train and run AI models.","watch":"Data-center demand, new-chip ramps, margins, supply and hyperscaler spending.","news":true},
+      {"symbol":"MSFT","name":"Microsoft","group":"AI Platforms","role":"Cloud and software leader embedding AI across Azure, Microsoft 365 and developer tools.","watch":"Azure growth, AI monetization, capital spending and enterprise adoption.","news":true},
+      {"symbol":"GOOGL","name":"Alphabet","group":"AI Platforms","role":"Search, advertising and cloud company investing heavily in Gemini and AI infrastructure.","watch":"Search economics, cloud growth, AI product adoption and capital spending.","news":true},
+      {"symbol":"AMZN","name":"Amazon","group":"AI Platforms","role":"Cloud and commerce leader using AWS to sell AI infrastructure and model services.","watch":"AWS growth, AI infrastructure demand, retail margins and capital spending.","news":false},
+      {"symbol":"META","name":"Meta Platforms","group":"AI Platforms","role":"Digital advertising and social-platform company using AI to improve engagement and ad performance.","watch":"Ad growth, AI infrastructure spending, engagement and monetization.","news":false},
+      {"symbol":"AVGO","name":"Broadcom","group":"AI Infrastructure","role":"Semiconductor and infrastructure-software company benefiting from custom AI chips and networking.","watch":"AI networking demand, custom accelerators, margins and VMware integration.","news":false},
+      {"symbol":"PLTR","name":"Palantir","group":"AI Software","role":"Data and analytics software company selling AI-enabled operating platforms to governments and businesses.","watch":"Commercial growth, large contract wins, margins and valuation.","news":false},
+      {"symbol":"LLY","name":"Eli Lilly","group":"Pharma","role":"Large pharmaceutical company with major diabetes, obesity, oncology and neuroscience franchises.","watch":"GLP-1 demand, manufacturing capacity, clinical results and pricing.","news":true},
+      {"symbol":"NVO","name":"Novo Nordisk","group":"Pharma","role":"Global diabetes and obesity specialist with a major GLP-1 drug franchise.","watch":"GLP-1 market share, supply, next-generation trials and pricing pressure.","news":false},
+      {"symbol":"UNH","name":"UnitedHealth Group","group":"Managed Care","role":"Large health insurer and healthcare-services company spanning UnitedHealthcare and Optum.","watch":"Medical cost trends, reimbursement, regulation and Optum performance.","news":true},
+      {"symbol":"JNJ","name":"Johnson & Johnson","group":"Pharma / MedTech","role":"Diversified healthcare company combining innovative medicines and medical technology.","watch":"Drug launches, medtech growth, litigation and pipeline execution.","news":false},
+      {"symbol":"ABT","name":"Abbott Laboratories","group":"MedTech","role":"Medical-device and diagnostics company with strong diabetes, cardiovascular and testing businesses.","watch":"Continuous-glucose-monitor growth, device launches, margins and diagnostics demand.","news":false},
+      {"symbol":"ISRG","name":"Intuitive Surgical","group":"MedTech","role":"Robotic-surgery leader built around the da Vinci surgical system and recurring instrument revenue.","watch":"Procedure growth, system placements, new-platform adoption and margins.","news":true},
+      {"symbol":"TMO","name":"Thermo Fisher Scientific","group":"Life Science Tools","role":"Major supplier of instruments, lab products and services used across biotech and pharmaceutical research.","watch":"Biopharma spending, China demand, organic growth and margin recovery.","news":false}
+    ]
   }
 }
