@@ -15,8 +15,31 @@ DATA_PATH.parent.mkdir(exist_ok=True)
 config = json.loads(CONFIG_PATH.read_text())
 markets_cfg = config.get("markets", [])
 holdings_cfg = config.get("holdings", [])
-watch_cfg = markets_cfg + holdings_cfg
-news_symbols = [x["symbol"] for x in holdings_cfg if x.get("news")]
+sector_cfg = config.get("sectorCoverage", {})
+
+
+def dedupe_items(items):
+    seen = set()
+    result = []
+    for item in items:
+        symbol = item.get("symbol")
+        if not symbol or symbol in seen:
+            continue
+        seen.add(symbol)
+        result.append(item)
+    return result
+
+
+sector_items = []
+for companies in sector_cfg.values():
+    sector_items.extend(companies or [])
+
+watch_cfg = dedupe_items(markets_cfg + holdings_cfg + sector_items)
+news_items = dedupe_items(
+    [x for x in holdings_cfg if x.get("news")]
+    + [x for x in sector_items if x.get("news")]
+)
+news_symbols = [x["symbol"] for x in news_items]
 
 
 def dividend_snapshot():
@@ -31,15 +54,21 @@ def dividend_snapshot():
 
 
 if not TOKEN:
-    if not DATA_PATH.exists():
-        DATA_PATH.write_text(json.dumps({
-            "generatedAt": None,
-            "market": [],
-            "news": [],
-            "portfolioNews": [],
-            "dividends": dividend_snapshot(),
-            "config": config
-        }, indent=2))
+    existing = {}
+    if DATA_PATH.exists():
+        try:
+            existing = json.loads(DATA_PATH.read_text())
+        except Exception:
+            existing = {}
+    existing.update({
+        "config": config,
+        "dividends": dividend_snapshot(),
+    })
+    existing.setdefault("generatedAt", None)
+    existing.setdefault("market", [])
+    existing.setdefault("news", [])
+    existing.setdefault("portfolioNews", [])
+    DATA_PATH.write_text(json.dumps(existing, indent=2))
     print("FINNHUB_API_KEY is not configured yet; publishing the site with placeholder data.")
     raise SystemExit(0)
 
@@ -103,7 +132,7 @@ for symbol in news_symbols:
             symbol=symbol,
             **{"from": from_day.isoformat(), "to": today.isoformat()}
         ))
-        portfolio_news.extend(clean_article(a, symbol) for a in arr[:4] if a.get("headline"))
+        portfolio_news.extend(clean_article(a, symbol) for a in arr[:3] if a.get("headline"))
     except Exception:
         pass
 
@@ -117,4 +146,7 @@ edition = {
 }
 
 DATA_PATH.write_text(json.dumps(edition, indent=2))
-print("Wrote data/edition.json from config.json and the latest daily dividend snapshot")
+print(
+    f"Wrote data/edition.json with {len(watch_cfg)} quotes, "
+    f"{len(news_symbols)} company-news feeds and the latest dividend snapshot"
+)
