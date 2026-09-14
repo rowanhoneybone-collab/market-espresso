@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-09-13T16:33:08.254289+00:00",
-  "calendarDatesChecked": 39,
+  "generatedAt": "2026-09-14T18:08:24.905679+00:00",
+  "calendarDatesChecked": 38,
   "records": [
     {
       "symbol": "ITW",
@@ -93,9 +93,9 @@
         }
       ],
       "trailing12m": 6.44,
-      "trailingYieldPct": 2.4016,
+      "trailingYieldPct": 2.3862,
       "annualizedDividend": null,
-      "historyPrice": 268.16,
+      "historyPrice": 269.88,
       "historyError": null,
       "forwardError": null
     },
@@ -190,9 +190,9 @@
         }
       ],
       "trailing12m": 2.017,
-      "trailingYieldPct": 4.3753,
+      "trailingYieldPct": 4.3821,
       "annualizedDividend": null,
-      "historyPrice": 46.1,
+      "historyPrice": 46.028,
       "historyError": null,
       "forwardError": null
     },
@@ -299,9 +299,9 @@
         }
       ],
       "trailing12m": 2.963,
-      "trailingYieldPct": 3.2245,
+      "trailingYieldPct": 3.228,
       "annualizedDividend": null,
-      "historyPrice": 91.89,
+      "historyPrice": 91.79,
       "historyError": null,
       "forwardError": null
     },
@@ -372,9 +372,9 @@
         }
       ],
       "trailing12m": 7.345,
-      "trailingYieldPct": 1.0455,
+      "trailingYieldPct": 1.0479,
       "annualizedDividend": null,
-      "historyPrice": 702.56,
+      "historyPrice": 700.9,
       "historyError": null,
       "forwardError": null
     }
