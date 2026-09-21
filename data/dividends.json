@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-20T16:22:41.141603+00:00",
+  "generatedAt": "2026-09-21T18:16:50.528638+00:00",
   "calendarDatesChecked": 35,
   "records": [
     {
@@ -93,9 +93,9 @@
         }
       ],
       "trailing12m": 6.44,
-      "trailingYieldPct": 2.3903,
+      "trailingYieldPct": 2.404,
       "annualizedDividend": null,
-      "historyPrice": 269.42,
+      "historyPrice": 267.89,
       "historyError": null,
       "forwardError": null
     },
@@ -166,9 +166,9 @@
         }
       ],
       "trailing12m": 2.017,
-      "trailingYieldPct": 4.5245,
+      "trailingYieldPct": 4.6373,
       "annualizedDividend": null,
-      "historyPrice": 44.58,
+      "historyPrice": 43.495,
       "historyError": null,
       "forwardError": null
     },
@@ -275,9 +275,9 @@
         }
       ],
       "trailing12m": 2.963,
-      "trailingYieldPct": 3.2625,
+      "trailingYieldPct": 3.2773,
       "annualizedDividend": null,
-      "historyPrice": 90.82,
+      "historyPrice": 90.41,
       "historyError": null,
       "forwardError": null
     },
@@ -348,9 +348,9 @@
         }
       ],
       "trailing12m": 7.345,
-      "trailingYieldPct": 1.0466,
+      "trailingYieldPct": 1.0307,
       "annualizedDividend": null,
-      "historyPrice": 701.78,
+      "historyPrice": 712.6,
       "historyError": null,
       "forwardError": null
     }
