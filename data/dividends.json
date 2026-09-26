@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-09-25T17:25:40.329706+00:00",
-  "calendarDatesChecked": 35,
+  "generatedAt": "2026-09-26T16:34:55.013420+00:00",
+  "calendarDatesChecked": 23,
   "records": [
     {
       "symbol": "ITW",
@@ -93,9 +93,9 @@
         }
       ],
       "trailing12m": 6.44,
-      "trailingYieldPct": 2.3481,
+      "trailingYieldPct": 2.3476,
       "annualizedDividend": null,
-      "historyPrice": 274.26,
+      "historyPrice": 274.32,
       "historyError": null,
       "forwardError": null
     },
@@ -166,9 +166,9 @@
         }
       ],
       "trailing12m": 2.017,
-      "trailingYieldPct": 4.5977,
+      "trailingYieldPct": 4.5685,
       "annualizedDividend": null,
-      "historyPrice": 43.87,
+      "historyPrice": 44.15,
       "historyError": null,
       "forwardError": null
     },
@@ -275,9 +275,9 @@
         }
       ],
       "trailing12m": 2.963,
-      "trailingYieldPct": 3.2578,
+      "trailingYieldPct": 3.2582,
       "annualizedDividend": null,
-      "historyPrice": 90.951,
+      "historyPrice": 90.94,
       "historyError": null,
       "forwardError": null
     },
@@ -287,9 +287,33 @@
       "qualityNote": "Broad-market ETF distributions. Income is diversified across the S&P 500 and can vary quarter to quarter.",
       "source": "StockAnalysis forward events + Nasdaq calendar fallback + Yahoo Finance history",
       "dataAvailable": true,
-      "status": "Awaiting next declaration",
-      "next": null,
-      "upcoming": [],
+      "status": "Confirmed",
+      "next": {
+        "symbol": "VOO",
+        "name": "VOO",
+        "amount": 1.8226,
+        "currency": "USD",
+        "declarationDate": null,
+        "exDate": "2026-09-28",
+        "recordDate": "2026-09-28",
+        "payDate": "2026-09-30",
+        "annualizedDividend": null,
+        "source": "StockAnalysis dividend history"
+      },
+      "upcoming": [
+        {
+          "symbol": "VOO",
+          "name": "VOO",
+          "amount": 1.8226,
+          "currency": "USD",
+          "declarationDate": null,
+          "exDate": "2026-09-28",
+          "recordDate": "2026-09-28",
+          "payDate": "2026-09-30",
+          "annualizedDividend": null,
+          "source": "StockAnalysis dividend history"
+        }
+      ],
       "pendingPayments": [],
       "recent": [
         {
@@ -348,9 +372,9 @@
         }
       ],
       "trailing12m": 7.345,
-      "trailingYieldPct": 1.0335,
+      "trailingYieldPct": 1.0334,
       "annualizedDividend": null,
-      "historyPrice": 710.675,
+      "historyPrice": 710.79,
       "historyError": null,
       "forwardError": null
     }
