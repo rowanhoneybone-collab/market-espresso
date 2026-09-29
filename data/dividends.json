@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-09-28T19:47:20.440465+00:00",
-  "calendarDatesChecked": 23,
+  "generatedAt": "2026-09-29T18:12:12.665772+00:00",
+  "calendarDatesChecked": 41,
   "records": [
     {
       "symbol": "ITW",
@@ -93,9 +93,9 @@
         }
       ],
       "trailing12m": 6.44,
-      "trailingYieldPct": 2.3478,
+      "trailingYieldPct": 2.416,
       "annualizedDividend": null,
-      "historyPrice": 274.3,
+      "historyPrice": 266.56,
       "historyError": null,
       "forwardError": null
     },
@@ -166,9 +166,9 @@
         }
       ],
       "trailing12m": 2.017,
-      "trailingYieldPct": 4.5316,
+      "trailingYieldPct": 4.6224,
       "annualizedDividend": null,
-      "historyPrice": 44.51,
+      "historyPrice": 43.635,
       "historyError": null,
       "forwardError": null
     },
@@ -275,9 +275,9 @@
         }
       ],
       "trailing12m": 2.963,
-      "trailingYieldPct": 3.2766,
+      "trailingYieldPct": 3.3541,
       "annualizedDividend": null,
-      "historyPrice": 90.43,
+      "historyPrice": 88.34,
       "historyError": null,
       "forwardError": null
     },
@@ -287,7 +287,7 @@
       "qualityNote": "Broad-market ETF distributions. Income is diversified across the S&P 500 and can vary quarter to quarter.",
       "source": "StockAnalysis forward events + Nasdaq calendar fallback + Yahoo Finance history",
       "dataAvailable": true,
-      "status": "Confirmed",
+      "status": "Payment scheduled",
       "next": {
         "symbol": "VOO",
         "name": "VOO",
@@ -300,7 +300,8 @@
         "annualizedDividend": null,
         "source": "StockAnalysis dividend history"
       },
-      "upcoming": [
+      "upcoming": [],
+      "pendingPayments": [
         {
           "symbol": "VOO",
           "name": "VOO",
@@ -314,8 +315,16 @@
           "source": "StockAnalysis dividend history"
         }
       ],
-      "pendingPayments": [],
       "recent": [
+        {
+          "amount": 1.823,
+          "currency": "USD",
+          "exDate": "2026-09-28",
+          "payDate": null,
+          "recordDate": null,
+          "declarationDate": null,
+          "source": "Yahoo Finance historical distributions"
+        },
         {
           "amount": 1.962,
           "currency": "USD",
@@ -360,21 +369,12 @@
           "recordDate": null,
           "declarationDate": null,
           "source": "Yahoo Finance historical distributions"
-        },
-        {
-          "amount": 1.812,
-          "currency": "USD",
-          "exDate": "2025-03-27",
-          "payDate": null,
-          "recordDate": null,
-          "declarationDate": null,
-          "source": "Yahoo Finance historical distributions"
         }
       ],
-      "trailing12m": 7.345,
-      "trailingYieldPct": 1.0438,
+      "trailing12m": 9.168,
+      "trailingYieldPct": 1.3072,
       "annualizedDividend": null,
-      "historyPrice": 703.68,
+      "historyPrice": 701.33,
       "historyError": null,
       "forwardError": null
     }
