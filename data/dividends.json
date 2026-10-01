@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-09-30T18:04:02.944093+00:00",
-  "calendarDatesChecked": 41,
+  "generatedAt": "2026-10-01T18:31:50.859357+00:00",
+  "calendarDatesChecked": 44,
   "records": [
     {
       "symbol": "ITW",
@@ -8,7 +8,7 @@
       "qualityNote": "Dividend-growth industrial. Focus on free cash flow, payout sustainability and continued dividend growth.",
       "source": "StockAnalysis forward events + Nasdaq calendar fallback + Yahoo Finance history",
       "dataAvailable": true,
-      "status": "Confirmed",
+      "status": "Payment scheduled",
       "next": {
         "symbol": "ITW",
         "name": "Illinois Tool Works",
@@ -21,7 +21,8 @@
         "annualizedDividend": null,
         "source": "StockAnalysis dividend history"
       },
-      "upcoming": [
+      "upcoming": [],
+      "pendingPayments": [
         {
           "symbol": "ITW",
           "name": "Illinois Tool Works",
@@ -35,8 +36,16 @@
           "source": "StockAnalysis dividend history"
         }
       ],
-      "pendingPayments": [],
       "recent": [
+        {
+          "amount": 1.72,
+          "currency": "USD",
+          "exDate": "2026-09-30",
+          "payDate": null,
+          "recordDate": null,
+          "declarationDate": null,
+          "source": "Yahoo Finance historical distributions"
+        },
         {
           "amount": 1.61,
           "currency": "USD",
@@ -81,21 +90,12 @@
           "recordDate": null,
           "declarationDate": null,
           "source": "Yahoo Finance historical distributions"
-        },
-        {
-          "amount": 1.5,
-          "currency": "USD",
-          "exDate": "2025-03-31",
-          "payDate": null,
-          "recordDate": null,
-          "declarationDate": null,
-          "source": "Yahoo Finance historical distributions"
         }
       ],
-      "trailing12m": 6.44,
-      "trailingYieldPct": 2.4684,
+      "trailing12m": 6.55,
+      "trailingYieldPct": 2.51,
       "annualizedDividend": null,
-      "historyPrice": 260.895,
+      "historyPrice": 260.96,
       "historyError": null,
       "forwardError": null
     },
@@ -166,9 +166,9 @@
         }
       ],
       "trailing12m": 2.017,
-      "trailingYieldPct": 4.5443,
+      "trailingYieldPct": 4.5341,
       "annualizedDividend": null,
-      "historyPrice": 44.385,
+      "historyPrice": 44.485,
       "historyError": null,
       "forwardError": null
     },
@@ -182,12 +182,12 @@
       "next": {
         "symbol": "TTE",
         "name": "TotalEnergies",
-        "amount": 1.04263,
+        "amount": 1.01937,
         "currency": "USD",
         "declarationDate": null,
-        "exDate": "2026-09-30",
-        "recordDate": "2026-10-01",
-        "payDate": "2026-10-21",
+        "exDate": "2027-01-04",
+        "recordDate": "2027-01-04",
+        "payDate": "2027-01-22",
         "annualizedDividend": null,
         "source": "StockAnalysis dividend history"
       },
@@ -195,19 +195,7 @@
         {
           "symbol": "TTE",
           "name": "TotalEnergies",
-          "amount": 1.04263,
-          "currency": "USD",
-          "declarationDate": null,
-          "exDate": "2026-09-30",
-          "recordDate": "2026-10-01",
-          "payDate": "2026-10-21",
-          "annualizedDividend": null,
-          "source": "StockAnalysis dividend history"
-        },
-        {
-          "symbol": "TTE",
-          "name": "TotalEnergies",
-          "amount": 1.04263,
+          "amount": 1.01937,
           "currency": "USD",
           "declarationDate": null,
           "exDate": "2027-01-04",
@@ -217,8 +205,30 @@
           "source": "StockAnalysis dividend history"
         }
       ],
-      "pendingPayments": [],
+      "pendingPayments": [
+        {
+          "symbol": "TTE",
+          "name": "TotalEnergies",
+          "amount": 1.01983,
+          "currency": "USD",
+          "declarationDate": null,
+          "exDate": "2026-09-30",
+          "recordDate": "2026-10-01",
+          "payDate": "2026-10-21",
+          "annualizedDividend": null,
+          "source": "StockAnalysis dividend history"
+        }
+      ],
       "recent": [
+        {
+          "amount": 1.021,
+          "currency": "USD",
+          "exDate": "2026-09-30",
+          "payDate": null,
+          "recordDate": null,
+          "declarationDate": null,
+          "source": "Yahoo Finance historical distributions"
+        },
         {
           "amount": 0.974,
           "currency": "USD",
@@ -263,21 +273,12 @@
           "recordDate": null,
           "declarationDate": null,
           "source": "Yahoo Finance historical distributions"
-        },
-        {
-          "amount": 0.831,
-          "currency": "USD",
-          "exDate": "2024-12-31",
-          "payDate": null,
-          "recordDate": null,
-          "declarationDate": null,
-          "source": "Yahoo Finance historical distributions"
         }
       ],
-      "trailing12m": 2.963,
-      "trailingYieldPct": 3.4223,
+      "trailing12m": 2.99,
+      "trailingYieldPct": 3.5462,
       "annualizedDividend": null,
-      "historyPrice": 86.58,
+      "historyPrice": 84.315,
       "historyError": null,
       "forwardError": null
     },
@@ -287,34 +288,10 @@
       "qualityNote": "Broad-market ETF distributions. Income is diversified across the S&P 500 and can vary quarter to quarter.",
       "source": "StockAnalysis forward events + Nasdaq calendar fallback + Yahoo Finance history",
       "dataAvailable": true,
-      "status": "Payment scheduled",
-      "next": {
-        "symbol": "VOO",
-        "name": "VOO",
-        "amount": 1.8226,
-        "currency": "USD",
-        "declarationDate": null,
-        "exDate": "2026-09-28",
-        "recordDate": "2026-09-28",
-        "payDate": "2026-09-30",
-        "annualizedDividend": null,
-        "source": "StockAnalysis dividend history"
-      },
+      "status": "Awaiting next declaration",
+      "next": null,
       "upcoming": [],
-      "pendingPayments": [
-        {
-          "symbol": "VOO",
-          "name": "VOO",
-          "amount": 1.8226,
-          "currency": "USD",
-          "declarationDate": null,
-          "exDate": "2026-09-28",
-          "recordDate": "2026-09-28",
-          "payDate": "2026-09-30",
-          "annualizedDividend": null,
-          "source": "StockAnalysis dividend history"
-        }
-      ],
+      "pendingPayments": [],
       "recent": [
         {
           "amount": 1.823,
@@ -372,9 +349,9 @@
         }
       ],
       "trailing12m": 7.428,
-      "trailingYieldPct": 1.0532,
+      "trailingYieldPct": 1.0578,
       "annualizedDividend": null,
-      "historyPrice": 705.265,
+      "historyPrice": 702.18,
       "historyError": null,
       "forwardError": null
     }
