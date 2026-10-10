@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-09T18:27:50.973431+00:00",
+  "generatedAt": "2026-10-10T17:25:41.821916+00:00",
   "calendarDatesChecked": 44,
   "records": [
     {
@@ -8,34 +8,10 @@
       "qualityNote": "Dividend-growth industrial. Focus on free cash flow, payout sustainability and continued dividend growth.",
       "source": "StockAnalysis forward events + Nasdaq calendar fallback + Yahoo Finance history",
       "dataAvailable": true,
-      "status": "Payment scheduled",
-      "next": {
-        "symbol": "ITW",
-        "name": "Illinois Tool Works",
-        "amount": 1.72,
-        "currency": "USD",
-        "declarationDate": null,
-        "exDate": "2026-09-30",
-        "recordDate": "2026-09-30",
-        "payDate": "2026-10-09",
-        "annualizedDividend": null,
-        "source": "StockAnalysis dividend history"
-      },
+      "status": "Awaiting next declaration",
+      "next": null,
       "upcoming": [],
-      "pendingPayments": [
-        {
-          "symbol": "ITW",
-          "name": "Illinois Tool Works",
-          "amount": 1.72,
-          "currency": "USD",
-          "declarationDate": null,
-          "exDate": "2026-09-30",
-          "recordDate": "2026-09-30",
-          "payDate": "2026-10-09",
-          "annualizedDividend": null,
-          "source": "StockAnalysis dividend history"
-        }
-      ],
+      "pendingPayments": [],
       "recent": [
         {
           "amount": 1.72,
@@ -93,9 +69,9 @@
         }
       ],
       "trailing12m": 6.55,
-      "trailingYieldPct": 2.4746,
+      "trailingYieldPct": 2.4798,
       "annualizedDividend": null,
-      "historyPrice": 264.685,
+      "historyPrice": 264.13,
       "historyError": null,
       "forwardError": null
     },
@@ -166,9 +142,9 @@
         }
       ],
       "trailing12m": 2.017,
-      "trailingYieldPct": 4.3526,
+      "trailingYieldPct": 4.3611,
       "annualizedDividend": null,
-      "historyPrice": 46.34,
+      "historyPrice": 46.25,
       "historyError": null,
       "forwardError": null
     },
@@ -276,9 +252,9 @@
         }
       ],
       "trailing12m": 2.99,
-      "trailingYieldPct": 3.4392,
+      "trailingYieldPct": 3.4723,
       "annualizedDividend": null,
-      "historyPrice": 86.94,
+      "historyPrice": 86.11,
       "historyError": null,
       "forwardError": null
     },
@@ -349,9 +325,9 @@
         }
       ],
       "trailing12m": 7.428,
-      "trailingYieldPct": 1.0378,
+      "trailingYieldPct": 1.038,
       "annualizedDividend": null,
-      "historyPrice": 715.76,
+      "historyPrice": 715.59,
       "historyError": null,
       "forwardError": null
     }
