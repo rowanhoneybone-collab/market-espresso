@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-10T17:25:41.821916+00:00",
+  "generatedAt": "2026-10-11T17:44:58.551032+00:00",
   "calendarDatesChecked": 44,
   "records": [
     {
@@ -158,7 +158,7 @@
       "next": {
         "symbol": "TTE",
         "name": "TotalEnergies",
-        "amount": 1.01937,
+        "amount": 1.00795,
         "currency": "USD",
         "declarationDate": null,
         "exDate": "2027-01-04",
@@ -171,7 +171,7 @@
         {
           "symbol": "TTE",
           "name": "TotalEnergies",
-          "amount": 1.01937,
+          "amount": 1.00795,
           "currency": "USD",
           "declarationDate": null,
           "exDate": "2027-01-04",
