@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-21T17:31:50.714482+00:00",
+  "generatedAt": "2026-10-22T17:29:07.813160+00:00",
   "calendarDatesChecked": 44,
   "records": [
     {
@@ -69,9 +69,9 @@
         }
       ],
       "trailing12m": 6.55,
-      "trailingYieldPct": 2.362,
+      "trailingYieldPct": 2.3604,
       "annualizedDividend": null,
-      "historyPrice": 277.305,
+      "historyPrice": 277.5,
       "historyError": null,
       "forwardError": null
     },
@@ -142,9 +142,9 @@
         }
       ],
       "trailing12m": 2.017,
-      "trailingYieldPct": 4.0478,
+      "trailingYieldPct": 4.036,
       "annualizedDividend": null,
-      "historyPrice": 49.83,
+      "historyPrice": 49.975,
       "historyError": null,
       "forwardError": null
     },
@@ -181,20 +181,7 @@
           "source": "StockAnalysis dividend history"
         }
       ],
-      "pendingPayments": [
-        {
-          "symbol": "TTE",
-          "name": "TotalEnergies",
-          "amount": 1.01983,
-          "currency": "USD",
-          "declarationDate": null,
-          "exDate": "2026-09-30",
-          "recordDate": "2026-10-01",
-          "payDate": "2026-10-21",
-          "annualizedDividend": null,
-          "source": "StockAnalysis dividend history"
-        }
-      ],
+      "pendingPayments": [],
       "recent": [
         {
           "amount": 1.021,
@@ -252,9 +239,9 @@
         }
       ],
       "trailing12m": 2.99,
-      "trailingYieldPct": 3.305,
+      "trailingYieldPct": 3.3002,
       "annualizedDividend": null,
-      "historyPrice": 90.47,
+      "historyPrice": 90.6,
       "historyError": null,
       "forwardError": null
     },
@@ -325,9 +312,9 @@
         }
       ],
       "trailing12m": 7.428,
-      "trailingYieldPct": 1.0444,
+      "trailingYieldPct": 1.0588,
       "annualizedDividend": null,
-      "historyPrice": 711.195,
+      "historyPrice": 701.525,
       "historyError": null,
       "forwardError": null
     }
