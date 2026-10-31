@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-30T18:10:09.159780+00:00",
+  "generatedAt": "2026-10-31T17:19:30.471856+00:00",
   "calendarDatesChecked": 43,
   "records": [
     {
@@ -69,9 +69,9 @@
         }
       ],
       "trailing12m": 6.55,
-      "trailingYieldPct": 2.3299,
+      "trailingYieldPct": 2.3515,
       "annualizedDividend": null,
-      "historyPrice": 281.13,
+      "historyPrice": 278.55,
       "historyError": null,
       "forwardError": null
     },
@@ -142,9 +142,9 @@
         }
       ],
       "trailing12m": 2.017,
-      "trailingYieldPct": 3.9925,
+      "trailingYieldPct": 4.0028,
       "annualizedDividend": null,
-      "historyPrice": 50.52,
+      "historyPrice": 50.39,
       "historyError": null,
       "forwardError": null
     },
@@ -158,7 +158,7 @@
       "next": {
         "symbol": "TTE",
         "name": "TotalEnergies",
-        "amount": 1.00469,
+        "amount": 1.00503,
         "currency": "USD",
         "declarationDate": null,
         "exDate": "2027-01-04",
@@ -171,7 +171,7 @@
         {
           "symbol": "TTE",
           "name": "TotalEnergies",
-          "amount": 1.00469,
+          "amount": 1.00503,
           "currency": "USD",
           "declarationDate": null,
           "exDate": "2027-01-04",
@@ -239,9 +239,9 @@
         }
       ],
       "trailing12m": 2.99,
-      "trailingYieldPct": 3.146,
+      "trailingYieldPct": 3.1365,
       "annualizedDividend": null,
-      "historyPrice": 95.04,
+      "historyPrice": 95.33,
       "historyError": null,
       "forwardError": null
     },
@@ -312,9 +312,9 @@
         }
       ],
       "trailing12m": 7.428,
-      "trailingYieldPct": 1.0725,
+      "trailingYieldPct": 1.0691,
       "annualizedDividend": null,
-      "historyPrice": 692.56,
+      "historyPrice": 694.81,
       "historyError": null,
       "forwardError": null
     }
