@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-10-31T17:19:30.471856+00:00",
-  "calendarDatesChecked": 43,
+  "generatedAt": "2026-11-01T18:01:46.050146+00:00",
+  "calendarDatesChecked": 42,
   "records": [
     {
       "symbol": "ITW",
@@ -177,6 +177,18 @@
           "exDate": "2027-01-04",
           "recordDate": "2027-01-04",
           "payDate": "2027-01-22",
+          "annualizedDividend": null,
+          "source": "StockAnalysis dividend history"
+        },
+        {
+          "symbol": "TTE",
+          "name": "TotalEnergies",
+          "amount": 1.00503,
+          "currency": "USD",
+          "declarationDate": null,
+          "exDate": "2027-04-01",
+          "recordDate": "2027-04-01",
+          "payDate": "2027-04-20",
           "annualizedDividend": null,
           "source": "StockAnalysis dividend history"
         }
