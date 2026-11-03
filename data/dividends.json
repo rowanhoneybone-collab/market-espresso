@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-11-02T21:51:47.854950+00:00",
-  "calendarDatesChecked": 41,
+  "generatedAt": "2026-11-03T19:42:10.306922+00:00",
+  "calendarDatesChecked": 23,
   "records": [
     {
       "symbol": "ITW",
@@ -8,9 +8,33 @@
       "qualityNote": "Dividend-growth industrial. Focus on free cash flow, payout sustainability and continued dividend growth.",
       "source": "StockAnalysis forward events + Nasdaq calendar fallback + Yahoo Finance history",
       "dataAvailable": true,
-      "status": "Awaiting next declaration",
-      "next": null,
-      "upcoming": [],
+      "status": "Confirmed",
+      "next": {
+        "symbol": "ITW",
+        "name": "Illinois Tool Works",
+        "amount": 1.72,
+        "currency": "USD",
+        "declarationDate": null,
+        "exDate": "2026-12-31",
+        "recordDate": "2026-12-31",
+        "payDate": "2027-01-15",
+        "annualizedDividend": null,
+        "source": "StockAnalysis dividend history"
+      },
+      "upcoming": [
+        {
+          "symbol": "ITW",
+          "name": "Illinois Tool Works",
+          "amount": 1.72,
+          "currency": "USD",
+          "declarationDate": null,
+          "exDate": "2026-12-31",
+          "recordDate": "2026-12-31",
+          "payDate": "2027-01-15",
+          "annualizedDividend": null,
+          "source": "StockAnalysis dividend history"
+        }
+      ],
       "pendingPayments": [],
       "recent": [
         {
@@ -69,9 +93,9 @@
         }
       ],
       "trailing12m": 6.55,
-      "trailingYieldPct": 2.2582,
+      "trailingYieldPct": 2.2852,
       "annualizedDividend": null,
-      "historyPrice": 290.05,
+      "historyPrice": 286.63,
       "historyError": null,
       "forwardError": null
     },
@@ -81,9 +105,33 @@
       "qualityNote": "Energy income holding. The dividend can be attractive, but oil prices, debt and capital discipline matter.",
       "source": "StockAnalysis forward events + Nasdaq calendar fallback + Yahoo Finance history",
       "dataAvailable": true,
-      "status": "Awaiting next declaration",
-      "next": null,
-      "upcoming": [],
+      "status": "Confirmed",
+      "next": {
+        "symbol": "BP",
+        "name": "BP",
+        "amount": 0.5146,
+        "currency": "USD",
+        "declarationDate": null,
+        "exDate": "2026-11-13",
+        "recordDate": "2026-11-13",
+        "payDate": "2026-12-18",
+        "annualizedDividend": null,
+        "source": "StockAnalysis dividend history"
+      },
+      "upcoming": [
+        {
+          "symbol": "BP",
+          "name": "BP",
+          "amount": 0.5146,
+          "currency": "USD",
+          "declarationDate": null,
+          "exDate": "2026-11-13",
+          "recordDate": "2026-11-13",
+          "payDate": "2026-12-18",
+          "annualizedDividend": null,
+          "source": "StockAnalysis dividend history"
+        }
+      ],
       "pendingPayments": [],
       "recent": [
         {
@@ -142,9 +190,9 @@
         }
       ],
       "trailing12m": 2.017,
-      "trailingYieldPct": 4.2126,
+      "trailingYieldPct": 4.2445,
       "annualizedDividend": null,
-      "historyPrice": 47.88,
+      "historyPrice": 47.52,
       "historyError": null,
       "forwardError": null
     },
@@ -251,9 +299,9 @@
         }
       ],
       "trailing12m": 2.99,
-      "trailingYieldPct": 3.2227,
+      "trailingYieldPct": 3.2309,
       "annualizedDividend": null,
-      "historyPrice": 92.78,
+      "historyPrice": 92.545,
       "historyError": null,
       "forwardError": null
     },
@@ -324,9 +372,9 @@
         }
       ],
       "trailing12m": 7.428,
-      "trailingYieldPct": 1.0745,
+      "trailingYieldPct": 1.0703,
       "annualizedDividend": null,
-      "historyPrice": 691.32,
+      "historyPrice": 694.005,
       "historyError": null,
       "forwardError": null
     }
