@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-14T18:24:10.388764+00:00",
+  "generatedAt": "2026-11-15T19:01:37.626595+00:00",
   "calendarDatesChecked": 41,
   "records": [
     {
@@ -189,8 +189,8 @@
           "source": "Yahoo Finance historical distributions"
         }
       ],
-      "trailing12m": 2.537,
-      "trailingYieldPct": 5.5514,
+      "trailing12m": 2.038,
+      "trailingYieldPct": 4.4595,
       "annualizedDividend": null,
       "historyPrice": 45.7,
       "historyError": null,
